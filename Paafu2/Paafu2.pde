@@ -38,6 +38,13 @@ DropdownList overview;
 DropdownList stateDropdown;
 DropdownList filter;
 
+// Button Status after click 'Filter'
+boolean unclickFilterButtons = true;
+Button[] buttons = new Button[2];
+DropdownList[] dropdowns = new DropdownList[3];
+
+// 0 for button, 1 for dropdown list
+int[] buttonOrDropList = new int[]{0,1,1,0,1};
 
 String info = "";
 float infoTableX = 0.0;
@@ -128,7 +135,65 @@ void draw() {
   background(img);
   
   overviewUI();
-  
+  filterclicked();
+}
+
+void filterclicked(){
+  int bindex = 0;
+  int dindex = 0;
+  if (unclickFilterButtons) {
+    for(int i = 0; i <buttonOrDropList.length; i++){
+      if (buttonOrDropList[i] == 0){
+        if(buttons[bindex] == null){
+          buttons[bindex] = controlP5.addButton("button" + i)
+                                     .setPosition(290 + i * 100, 80)
+                                     .setSize(70,25);
+          bindex = bindex + 1;
+        }
+      }
+
+      else if(buttonOrDropList[i] == 1){
+        if(dropdowns[dindex] == null){
+          dropdowns[dindex] = controlP5.addDropdownList("dropdown" + i)
+                                      .setPosition(290 + i * 100, 80)
+                                      .setSize(70,25)
+                                      .setItemHeight(25)
+                                      .setBarHeight(25);
+          dindex = dindex + 1;
+        }
+      }
+    }
+    buttons[0].setLabel("Filter By"); //<>//
+    buttons[1].setLabel("Area");
+    dropdowns[0].setLabel("Municipality");
+    dropdowns[1].setLabel("Year");
+    dropdowns[2].setLabel("Sort Order");
+  }
+
+  else{
+    for(int i = 0; i <buttonOrDropList.length; i++){
+      if (buttonOrDropList[i] == 0){
+        if (buttons[bindex] != null){
+          controlP5.remove("button" + i);
+          buttons[bindex] = null;
+          bindex = bindex + 1;
+        }
+      }
+
+      else if(buttonOrDropList[i] == 1){
+        if(dropdowns[dindex] != null){
+          controlP5.remove("dropdown" + i);
+          dropdowns[dindex] = null;
+          dindex = dindex + 1;
+        }
+      }
+    }
+  }
+}
+
+
+void Filter() {
+  unclickFilterButtons = !unclickFilterButtons;
 }
 
 
@@ -139,11 +204,13 @@ void customizeDropdown(DropdownList ddl, String name) {
   ddl.setBarHeight(25);
 
   if (name == "state") {
-    ddl.addItem("YAP", 1);
+    ddl.addItem("YAP", 1); //<>//
     ddl.addItem("CHU", 2);
     ddl.addItem("KOS", 3);
     ddl.addItem("POH", 4);
   }
+  
+  if(name == "")
 
   ddl.setColorBackground(color(60));
   ddl.setColorActive(color(255,128));
@@ -156,11 +223,15 @@ void customizeDropdown(DropdownList ddl, String name) {
 public void micronesianOverview(int theValue) {
   println("a button event from micronesianOverview: "+ theValue); // 0
 }
+
+void FilterOverview(int theValue) {
+  println("a button event from Filter: "+ theValue); // 0
+}
  //<>//
 // when user clicks "Micronesia overview button"
 void overviewUI() {
   
-    // Municipalities should highlight (i.e., change appearance in some way) whenever the mouse is hovering
+  // Municipalities should highlight (i.e., change appearance in some way) whenever the mouse is hovering
   // over them so the user knows something will happen if they click.  If they do click while a municipality
   // is highlighted, then that municipality becomes the selectedMunicipality and the visualization should
   // update to show kinship relationships for it.
@@ -234,6 +305,8 @@ void overviewUI() {
       fill(111, 87, 0);
       text(municipalityName, screenX + xTextOffset, screenY);
     }
+    
+    
   }
    
 
