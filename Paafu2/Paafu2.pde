@@ -234,7 +234,6 @@ void Year(ControlEvent event){
   if (event.isFrom("Year")) {
     println("Selected Year: " + years[(int)event.getController().getValue()]); 
   }
-  return 1;
 }
 
 void Municipality(ControlEvent event){
