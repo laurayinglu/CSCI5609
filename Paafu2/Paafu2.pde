@@ -125,7 +125,6 @@ void setup() {
 }
 
 
-
 void draw() {
   // clear the screen
   background(230);
@@ -139,65 +138,120 @@ void draw() {
 }
 
 void filterclicked(){
-  int bindex = 0;
-  int dindex = 0;
+  String[] years = {"1980", "1994", "2000","2010"};
+  String[] orders = {"Ascending", "Descending"};
+  String[] munData = getColumnData(populationTable, "Municipality");
+
   if (unclickFilterButtons) {
-    for(int i = 0; i <buttonOrDropList.length; i++){
-      if (buttonOrDropList[i] == 0){
-        if(buttons[bindex] == null){
-          buttons[bindex] = controlP5.addButton("button" + i)
-                                     .setPosition(290 + i * 100, 80)
-                                     .setSize(70,25);
-          bindex = bindex + 1;
-        }
+    if(buttons[0] == null){
+      buttons[0] = controlP5.addButton("FilterBy")
+                            .setPosition(290 + 0 * 120, 80)
+                            .setSize(100,30);
+    }
+
+    if(buttons[1] == null){
+      buttons[1] = controlP5.addButton("Area")
+                            .setPosition(290 + 3 * 120, 80)
+                            .setSize(100,30);
+    }
+
+    if(dropdowns[0] == null){
+      dropdowns[0] = controlP5.addDropdownList("Municipality")
+                            .setPosition(290 + 1 * 120, 80)
+                            .setSize(100, 100)
+                            .setBarHeight(30)
+                            .setItemHeight(20);
+      
+      for (int k = 0; k < munData.length; k++) { 
+        dropdowns[0].addItem(munData[k], k);
       }
 
-      else if(buttonOrDropList[i] == 1){
-        if(dropdowns[dindex] == null){
-          dropdowns[dindex] = controlP5.addDropdownList("dropdown" + i)
-                                      .setPosition(290 + i * 100, 80)
-                                      .setSize(70,25)
-                                      .setItemHeight(25)
-                                      .setBarHeight(25);
-          dindex = dindex + 1;
-        }
+    }
+
+    if(dropdowns[1] == null){
+      dropdowns[1] = controlP5.addDropdownList("Year")
+                            .setPosition(290 + 2 * 120, 80)
+                            .setSize(100, 100)
+                            .setBarHeight(30)
+                            .setItemHeight(20);
+
+      for (int i = 0; i < years.length; i++) { 
+        dropdowns[1].addItem(years[i], i);
+      }
+
+    }
+
+
+    if(dropdowns[2] == null){
+      dropdowns[2] = controlP5.addDropdownList("SortOrder")
+                            .setPosition(290 + 4 * 120, 80)
+                            .setSize(100, 100)
+                            .setBarHeight(30)
+                            .setItemHeight(20);
+      
+      for (int j = 0; j < orders.length; j++) { 
+        dropdowns[2].addItem(orders[j], j);
       }
     }
-    buttons[0].setLabel("Filter By"); //<>//
-    buttons[1].setLabel("Area");
-    dropdowns[0].setLabel("Municipality");
-    dropdowns[1].setLabel("Year");
-    dropdowns[2].setLabel("Sort Order");
+
+    
   }
 
   else{
-    for(int i = 0; i <buttonOrDropList.length; i++){
-      if (buttonOrDropList[i] == 0){
-        if (buttons[bindex] != null){
-          controlP5.remove("button" + i);
-          buttons[bindex] = null;
-          bindex = bindex + 1;
-        }
-      }
+    if (buttons[0] != null){
+      controlP5.remove("FilterBy");
+      buttons[0] = null;
+    }
 
-      else if(buttonOrDropList[i] == 1){
-        if(dropdowns[dindex] != null){
-          controlP5.remove("dropdown" + i);
-          dropdowns[dindex] = null;
-          dindex = dindex + 1;
-        }
-      }
+    if (buttons[1] != null){
+      controlP5.remove("Area");
+      buttons[1] = null;
+    }
+
+    if (dropdowns[0] != null){ 
+      controlP5.remove("Municipality");
+      dropdowns[0] = null;
+    }
+
+    if (dropdowns[1] != null){
+      controlP5.remove("Year");
+      dropdowns[1] = null;
+    }    
+    
+    if (dropdowns[2] != null){
+      controlP5.remove("SortOrder");
+      dropdowns[2] = null;
     }
   }
 }
-
 
 void Filter() {
   unclickFilterButtons = !unclickFilterButtons;
 }
 
+int Year(ControlEvent event){
+  String[] years = {"1980", "1994", "2000", "2010"};
+  if (event.isFrom("Year")) {
+    println("Selected Year: " + years[(int)event.getController().getValue()]); 
+  }
+  return 1;
+}
 
-// for cutomize the dropdown menu
+void Municipality(ControlEvent event){
+  String[] munData = getColumnData(populationTable, "Municipality");
+  if (event.isFrom("Municipality")) {
+    println("Selected Municipality: " + munData[(int)event.getController().getValue()]);
+  }
+}
+
+void SortOrder(ControlEvent event){
+  String[] orders = {"Ascending", "Descending"};
+  if (event.isFrom("SortOrder")) {
+    println("Selected Sort Order: " + orders[(int)event.getController().getValue()]);
+  }
+}
+
+// for cutomize the dropdown menu //<>//
 void customizeDropdown(DropdownList ddl, String name) {
   ddl.setBackgroundColor(color(190));
   ddl.setItemHeight(25);
@@ -469,6 +523,16 @@ void loadRawDataTables() {
   
   populationTable = loadTable("FSM-municipality-populations.csv", "header");
   println("Population table:", populationTable.getRowCount(), "x", populationTable.getColumnCount()); 
+}
+
+
+String[] getColumnData(Table table, String columnName) {
+  String[] columnData = new String[table.getRowCount()];
+  for (int i = 0; i < table.getRowCount(); i++) {
+    TableRow row = table.getRow(i);
+    columnData[i] = row.getString(columnName);
+  }
+  return columnData;
 }
 
 
