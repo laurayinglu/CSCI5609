@@ -229,7 +229,7 @@ void Filter() {
   unclickFilterButtons = !unclickFilterButtons;
 }
 
-int Year(ControlEvent event){
+void Year(ControlEvent event){
   String[] years = {"1980", "1994", "2000", "2010"};
   if (event.isFrom("Year")) {
     println("Selected Year: " + years[(int)event.getController().getValue()]); 
