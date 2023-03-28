@@ -133,7 +133,7 @@ void draw() {
   img.resize(1400, 800);
   background(img);
   
-  overviewUI();
+  overviewUI("Population 2010 Census");
   filterclicked();
 }
 
@@ -280,10 +280,8 @@ public void micronesianOverview(int theValue) {
 void FilterOverview(int theValue) {
   println("a button event from Filter: "+ theValue); // 0
 }
- //<>//
-// when user clicks "Micronesia overview button"
-void overviewUI() {
-  
+
+void showMap(String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius) {
   // Municipalities should highlight (i.e., change appearance in some way) whenever the mouse is hovering
   // over them so the user knows something will happen if they click.  If they do click while a municipality
   // is highlighted, then that municipality becomes the selectedMunicipality and the visualization should
@@ -299,17 +297,6 @@ void overviewUI() {
   float mapX2 = panZoomMap.longitudeToScreenX(163.1);
   float mapY2 = panZoomMap.latitudeToScreenY(10.0);
   rect(mapX1, mapY1, mapX2, mapY2);
-  
-     
-  // Example Solution to Assignment 1
-     
-  // defined in screen space, so the circles will be the same size regardless of zoom level
-  float minRadius = 3;
-  float maxRadius = 28;
-  
-  color lowestPopulationColor = color(255, 224, 121);
-  color highestPopulationColor = color(232, 81, 21);
-  
   for (int i=0; i<locationTable.getRowCount(); i++) {
     TableRow rowData = locationTable.getRow(i);
     String municipalityName = rowData.getString("Municipality");
@@ -322,11 +309,14 @@ void overviewUI() {
     // for this row in the location table, then we can look up population data for the
     // municipality in the population table
     TableRow popRow = populationTable.findRow(municipalityName, "Municipality");
-    int pop2010 = popRow.getInt("Population 2010 Census");
+    int popuYear = popRow.getInt(popYear);
+
     int area = popRow.getInt("Area");
 
     // normalize data values to a 0..1 range
-    float pop2010_01 = (pop2010 - minPop2010) / (maxPop2010 - minPop2010);
+    float popuYear_01;
+    
+    popuYear_01 = (popuYear - maxPopYear) / (maxPopYear - minPopYear);
     float area_01 = (area - minArea) / (maxArea - minArea);
     
     // two examples using lerp*() to map the data values to changes in visual attributes
@@ -335,7 +325,7 @@ void overviewUI() {
     float radius = lerp(minRadius, maxRadius, area_01);
     
     // 2. adjust the fill color in proportion to the population
-    color c = lerpColorLab(lowestPopulationColor, highestPopulationColor, pop2010_01);
+    color c = lerpColorLab(lowestPopulationColor, highestPopulationColor, popuYear_01);
     fill(c);
     
     noStroke();
@@ -359,58 +349,115 @@ void overviewUI() {
       text(municipalityName, screenX + xTextOffset, screenY);
     }
     
-    
   }
-   
-
-  // DRAW THE LEGEND
+}
+ //<>//
+// when user clicks "Micronesia overview button"
+void overviewUI(String popYear) {
+     
+  // defined in screen space, so the circles will be the same size regardless of zoom level
+  float minRadius = 3;
+  float maxRadius = 28;
   
-  // block off the right side of the screen with a big rect
+  color lowestPopulationColor = color(255, 224, 121);
+  color highestPopulationColor = color(232, 81, 21);
+  float maxPopYear;
+  float minPopYear;
+  
+  if (popYear == "Population 2010 Census") {
+    maxPopYear = maxPop2010;
+    minPopYear = minPop2010;
+  } else if (popYear == "Population 2000 Census") {
+    maxPopYear = maxPop2000;
+    minPopYear = minPop2000;
+  } else if (popYear == "Population 1980 Census") {
+    maxPopYear = maxPop1980;
+    minPopYear = minPop1980;
+  } else { // 1994
+    maxPopYear = maxPop1994;
+    minPopYear = minPop1994;
+  }
+  
+  // show the map on the left side
+  showMap(popYear, minPopYear, maxPopYear, lowestPopulationColor, highestPopulationColor, minRadius, maxRadius);
+   
   fill(250);
   stroke(111, 87, 0);
-  rect(1400, -10, 1210, 810);
+  rect(1400, -10, 1010, 810); // (x, y width, height)
+  line(1010, 600, 1400, 600); // (x1, y1, x2, y2)
+  
+  showFilteredRes("", "", 1994, "asceding");
+  // show the right side 
+  showLengends(popYear, minPopYear, maxPopYear, lowestPopulationColor, highestPopulationColor, minRadius, maxRadius);
+           
+}
 
-  // colormap legend
+void showFilteredRes(String popYear, String muni, int year, String sortRule) {
   fill(111, 87, 0);
-  textAlign(CENTER, CENTER);
-  text("2010 Population", 1300, 50);
+  textSize(12);
+  text("Filter Results", 1020, 10);
+  rectMode(CORNER);
+  fill(167, 50);
+  rect(1010, 0, 90, 22);
+}
 
-  strokeWeight(1);
-  textAlign(RIGHT, CENTER);
-  int gradientHeight = 200;
-  int gradientWidth = 40;
-  int labelStep = gradientHeight / 5;
-  for (int y=0; y<gradientHeight; y++) {
-    float amt = 1.0 - (float)y/(gradientHeight-1);
-    color c = lerpColorLab(lowestPopulationColor, highestPopulationColor, amt);
-    stroke(c);
-    line(1300, 70 + y, 1300+gradientWidth, 70 + y);
-    if ((y % labelStep == 0) || (y == gradientHeight-1)) {
-      int labelValue = (int)(minPop2010 + amt*(maxPop2010 - minPop2010));
-      text(labelValue, 1290, 70 + y);
-    }
-  }
-            
+void showLengends(String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius) {
+  
+  fill(111, 87, 0);
+  textSize(12);
+  text("Lengends", 1020, 610);
+  rectMode(CORNER);
+  fill(167, 50);
+  rect(1010, 600, 70, 22);// , 28);
+  
+  fill(111, 87, 0);
+  textSize(10);
+  showPopLegend(popYear, minPopYear, maxPopYear, lowestPopulationColor, highestPopulationColor);
+  showAreaLengend(minRadius, maxRadius);
+}
+
+void showAreaLengend(float minRadius, float maxRadius) {
   // circle size legend
-  fill(111, 87, 0);
   textAlign(CENTER, CENTER);
-  text("Municipality Area", 1300, 300);
+  text("Municipality Area", 1090, 710);
 
   noStroke();
-  textAlign(RIGHT, CENTER);
+  //textAlign(RIGHT, CENTER);
   int nExamples = 6;
-  float y = 340;
+  float x = 1090;
   for (int i=0; i<nExamples; i++) {
     float amt = 1.0 - (float)i/(nExamples - 1);
     float radius = lerp(minRadius, maxRadius, amt);
     
     ellipseMode(RADIUS);
-    circle(1300 + radius, y, radius);
+    circle(x + radius - 40, 750, radius);
     int labelValue = (int)(minArea + amt*(maxArea - minArea));
-    text(labelValue, 1290, y);
-    y += 2 * radius;//maxIslandRadius;
+    text(labelValue, x + radius - 40, 785);
+    x += 2 * radius + 10;//maxIslandRadius;
   }
-  
+}
+
+void showPopLegend(String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor) {
+
+  // colormap legend
+
+  text(popYear, 1050, 635);
+  textAlign(CENTER, CENTER);
+  strokeWeight(1);
+  //textAlign(RIGHT, CENTER);
+  int gradientHeight = 20;
+  int gradientWidth = 220;
+  int labelStep = gradientWidth / 5;
+  for (int x=0; x<gradientWidth; x++) {
+    float amt = 1.0 - (float)x/(gradientWidth-1);
+    color c = lerpColorLab(lowestPopulationColor, highestPopulationColor, amt);
+    stroke(c);
+    line(1050 + x, 650, 1050 + x, 650+gradientHeight);
+    if ((x % labelStep == 0) || (x == gradientWidth-1)) {
+      int labelValue = (int)(minPopYear + amt*(maxPopYear - minPopYear));
+      text(labelValue, 1050 + x, 680);
+    }
+  }
 }
 
 
