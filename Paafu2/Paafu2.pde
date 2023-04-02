@@ -1,4 +1,4 @@
-/* CSci-5609 Assignment 2: Visualization of Paafu Kinship Ties for the Islands of Micronesia //<>// //<>// //<>//
+/* CSci-5609 Assignment 2: Visualization of Paafu Kinship Ties for the Islands of Micronesia //<>// //<>// //<>// //<>// //<>//
  */
 
 // === GLOBAL DATA VARIABLES ===
@@ -43,10 +43,12 @@ DropdownList inputDropdown1;
 DropdownList inputDropdown2;
 
 Chart compareChart;
+Chart filterChart;
 
 // Button Status after click 'Filter'
 boolean unclickFilterButtons = true;
-Button[] buttons = new Button[2];
+boolean checkFilterResult = false;
+Button[] buttons = new Button[4];
 DropdownList[] dropdowns = new DropdownList[3];
 
 // 0 for button, 1 for dropdown list
@@ -167,6 +169,16 @@ void setup() {
   
   compareChart.getColor().setBackground(color(0, 50));
   compareChart.hide();
+
+  filterChart = controlP5.addChart("popfilterChart")
+               .setPosition(1540, 110)
+               .setSize(300, 200)
+               .setRange(m, h)
+               .setView(Chart.BAR) // use Chart.LINE, Chart.PIE, Chart.AREA, Chart.BAR_CENTERED
+               ;
+  
+  filterChart.getColor().setBackground(color(0, 50));
+  filterChart.hide(); 
   
 }
 
@@ -199,6 +211,18 @@ void filterclicked() {
     if (buttons[1] == null) {
       buttons[1] = controlP5.addButton("Area")
         .setPosition(290 + 3 * 120, 80)
+        .setSize(100, 30);
+    }
+    
+    if (buttons[2] == null) {
+      buttons[2] = controlP5.addButton("Apply")
+        .setPosition(290 + 5 * 120, 80)
+        .setSize(100, 30);
+    }
+
+    if(buttons[3] == null){
+      buttons[3] = controlP5.addButton("Reset")
+        .setPosition(290 + 5 * 120, 80+40)
         .setSize(100, 30);
     }
 
@@ -247,6 +271,16 @@ void filterclicked() {
     if (buttons[1] != null) {
       controlP5.remove("Area");
       buttons[1] = null;
+    }
+    
+    if (buttons[2] != null) {
+      controlP5.remove("Apply");
+      buttons[2] = null;
+    }
+
+    if (buttons[3] != null) {
+      controlP5.remove("Reset");
+      buttons[3] = null;
     }
 
     if (dropdowns[0] != null) {
@@ -481,14 +515,14 @@ void showRes() {
   rectMode(CORNER);
   fill(167, 50);
   rect(1010, 0, 90, 22);
-  
- 
 }
 
 
 // filtered results
 void showFilteredRes(String popYear, String muni, int year, String sortRule) {
-
+  // Year + Sort order - Show the selected year census trend plot (1 year, all places)
+  // Muni + Sort order - Show the Municipality population trend plot (1 place, 4 years)
+  // Area + Sort order - Recent result sorting by area
 }
 
 void showLengends(String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius) {
