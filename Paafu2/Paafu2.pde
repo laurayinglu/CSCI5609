@@ -772,33 +772,57 @@ void createPlots(String i1, String i2) {//float[] pops, float max, float min) {
     // 1980 pop
     fill(chartColor1); // red
     rect(1040 + 0*10, 300 - newpops1[0], 10, newpops1[0]); // 1980
-    text(pops1[0], 1040 + 0*10, 290 - newpops1[0]); 
+    text(pops1[0], 1040 + 0*10, 290 - newpops1[0]);
+    point(1040 + 0*10+5, 300 - newpops1[0]);
     
     rect( 1040 + 7*10 , 300 - newpops1[1], 10, newpops1[1]); // 1990
     text(pops1[1], 1040 + 7*10, 290 - newpops1[1]); 
+    point(1040 + 7*10+5, 300 - newpops1[1]);
+    
+    line(1040 + 0*10+5, 300 - newpops1[0], 1040 + 7*10+5, 300 - newpops1[1]);
     
     rect( 1040 + 14*10 , 300 - newpops1[2], 10, newpops1[2]); // 2000
     text(pops1[2], 1040 + 14*10, 290 - newpops1[2]); 
+    point(1040 + 14*10+5, 300 - newpops1[2]);
+    
+    line(1040 + 7*10+5, 300 - newpops1[1], 1040 + 14*10+5, 300 - newpops1[2]);
     
     rect( 1040 + 21*10 , 300 - newpops1[3], 10, newpops1[3]); // 2010
     text(pops1[3], 1040 + 21*10, 290 - newpops1[3]); 
+    point(1040 + 21*10+5, 300 - newpops1[3]);
+    
+    line(1040 + 14*10+5, 300 - newpops1[2], 1040 + 21*10+5, 300 - newpops1[3]);
     
     rect( 1040 + 28*10 , 300 - newpops1[4], 10, newpops1[4]); // area
-    text(pops1[4], 1040 + 28*10, 290 - newpops1[4]); 
+    text(pops1[4], 1040 + 28*10 + 5, 290 - newpops1[4]); 
+    //point(1040 + 28*10+5, 300 - newpops1[4]);
+    
+    
     
     
     fill(chartColor2); // blue
     rect( 1040 + 1*10, 300 - newpops2[0], 10, newpops2[0]); //1980
     text(pops2[0], 1040 + 3*10, 290 - newpops2[0]); 
+    point(1040 + 1*10+5, 300 - newpops2[0]);
+    
     
     rect( 1040 + 8*10, 300 - newpops2[1], 10, newpops2[1]); // 1990
     text(pops2[1], 1040 + 10*10, 290 - newpops2[1]); 
+    point(1040 + 8*10+5, 300 - newpops2[1]);
+    
+    line(1040 + 1*10+5, 300 - newpops2[0], 1040 + 8*10+5, 300 - newpops2[1]);
     
     rect( 1040 + 15*10, 300 - newpops2[2], 10, newpops2[2]); // 2000
     text(pops2[2], 1040 + 17*10, 290 - newpops2[2]); 
+    point(1040 + 15*10+5, 300 - newpops2[2]);
+    
+    line(1040 + 8*10+5, 300 - newpops2[1], 1040 + 15*10+5, 300 - newpops2[2]);
     
     rect( 1040 + 22*10, 300 - newpops2[3], 10, newpops2[3]); // 2010
     text(pops2[3], 1040 + 24*10, 290 - newpops2[3]); 
+    point(1040 +22*10+5, 300 - newpops2[3]);
+    
+    line(1040 + 15*10+5, 300 - newpops2[2], 1040 +22*10+5, 300 - newpops2[3]);
     
     rect( 1040 + 29*10, 300 - newpops2[4], 10, newpops2[4]); // area
     text(pops2[4], 1055 + 31*10, 300 - newpops2[4]); 
@@ -822,6 +846,7 @@ void createPlots(String i1, String i2) {//float[] pops, float max, float min) {
   rect(1030, 340, 10, 10); // area
   text("Island2(right)",1072, 345); 
 
+  // show trends of population
   
 }
 
