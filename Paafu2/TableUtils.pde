@@ -91,7 +91,7 @@ static class TableUtils {
          pops[2] = rowValues.getFloat(4);
          pops[3] = rowValues.getFloat(5);
          pops[4] = rowValues.getFloat(6);
-         println("pops", pops[0], pops[1], pops[2], pops[3], pops[4]);
+         //println("pops", pops[0], pops[1], pops[2], pops[3], pops[4]);
          return pops;
        }
        

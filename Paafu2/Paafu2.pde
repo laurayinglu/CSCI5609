@@ -28,7 +28,8 @@ String selectedMunicipality = "Romanum";
 String islandInput1 = "";
 String islandInput2 = "";
 
-color chartColor = color(255);
+color chartColor1 = color(255);
+color chartColor2 = color(255);
 
 // for dropdown list
 import controlP5.*;
@@ -355,8 +356,8 @@ public void Compare(int theValue) {
   println("Compare button is clicked");
   // call functions to show compared results
 
-  chartColor = color(87);
-
+  chartColor1 = color(255,0,0);
+  chartColor2 = color(0,0,255);
 }
 
 public void Clear(int theValue) {
@@ -364,8 +365,10 @@ public void Clear(int theValue) {
   compareChart.hide(); // hide the compare res chart
   islandInput1 = "";
   islandInput2 = "";
-  chartColor = color(255);
 
+
+  chartColor1 = color(255);
+  chartColor2 = color(255);
   //inputDropdown1.clear();
   //inputDropdown2.clear();
 }
@@ -705,55 +708,69 @@ String getMunicipalityUnderMouse() {
 // (w,h), position (1040, 110)
 // 350, 200
 void createPlots(String i1, String i2) {//float[] pops, float max, float min) {
-  fill(chartColor);
+  fill(255);
+  
+  float yrange = 200.0;
+  
   float[] pops1 = TableUtils.getPops(populationTable, i1); // 1980, 1994, 2000, 2010, area
   float[] pops2 = TableUtils.getPops(populationTable, i2);
   
   float[] newpops1 = new float[5];
   float[] newpops2 = new float[5];
   
-  float pop1max = max(max(pops1[0], pops1[1], pops1[2]), pops1[3]);
-  float pop2max = max(max(pops2[0], pops2[1], pops2[2]), pops2[3]);
-
+  float pop1max = max(max(pops1[0], pops1[1], pops1[2]), max(pops1[3], pops1[4]));
+  float pop2max = max(max(pops2[0], pops2[1], pops2[2]), max(pops2[3], pops2[4]));
+  float m = max(pop1max, pop2max);
   
-  float pop1min = min(min(pops1[0], pops1[1], pops1[2]), pops1[3]);
-  float pop2min = min(min(pops2[0], pops2[1], pops2[2]), pops2[3]);
-
-  float areaMax = max(pops1[4], pops2[4]);
-  float areaMin = min(pops1[4], pops2[4]);
+  
+  float pop1min = min(min(pops1[0], pops1[1], pops1[2]), min(pops1[3], pops1[4]));
+  float pop2min = min(min(pops2[0], pops2[1], pops2[2]), min(pops2[3], pops2[4]));
+  float mi = min(pop1min, pop2min);
+  //float areaMax = max(pops1[4], pops2[4]);
+  //float areaMin = min(pops1[4], pops2[4]);
   
   //println("m and mi is", m, mi);
   
-  //normalize pops within 200
-  for (int i = 0; i < 4; i++){
-    if (pop1max != pop1min) {
-      newpops1[i] = 0 + ((200 - 0) / (pop1max - pop1min)) * (pops1[i] - pop1min);
+  //normalize pops within [10, 200]
+  for (int i = 0; i < 5; i++){
+    if (pops1[i] > 0 && m != mi) {
+      newpops1[i] = 10 + ((yrange - 10) / (m - mi)) * (pops1[i] - mi);
     }
     
-    if (pop2max != pop2min) {
-      newpops2[i] = 0 + ((200 - 0) / (pop2max - pop2min)) * (pops2[i] - pop2min);
+    if (pops2[i]> 0 && m != mi) {
+      newpops2[i] = 10 + ((yrange - 10) / (m - mi)) * (pops2[i] - mi);
     }
     
   }
   
-  if(areaMax != areaMin) {
-    newpops1[4] = 0 + ((200 - 0) / (areaMax - areaMin)) * (newpops1[4] - areaMin);
-    newpops2[4] = 0 + ((200 - 0) / (areaMax - areaMin)) * (newpops2[4] - areaMin);
-  }
+  //if(pops1[4] > 0 && areaMax != areaMin) {
+  //  println(areaMax, areaMin);
+  //  newpops1[4] = 10 + ((yrange - 10) / (areaMax - areaMin)) * (pops1[4] - areaMin);
+  //}
+  
+  //if(pops2[4]>0 && areaMax != areaMin) {
+  //  newpops2[4] = 10 + ((yrange - 10) / (areaMax - areaMin)) * (pops2[4] - areaMin);
+  //}
+  
+  println("pops1", pops1[0], pops1[1], pops1[2], pops1[3], pops1[4]);
+  println("newpops1", newpops1[0], newpops1[1], newpops1[2], newpops1[3], newpops1[4]);
+
+
+  println("pops2", pops2[0], pops2[1], pops2[2], pops2[3], pops2[4]);
+  println("newpops2", newpops2[0], newpops2[1], newpops2[2], newpops2[3], newpops2[4]);
 
   
-  if (pops1.length > 0 && pops2.length > 0){
-    //fill(chartColor);
-    println("draw the plot");
+  if (pops1[4] > 0 && pops2[4] > 0){
+
     stroke(126);
     line(1030, 300, 1030+350, 300); // 1380
-    line(1030, 300, 1030, 100); //200 height
+    //line(1030, 300, 1030, 100); //200 height
   
     // print out 4 years census of two islands
     // get the h and multiply by 4 to increase the visibility
     
     // 1980 pop
-    fill(255,0,0); // red
+    fill(chartColor1); // red
     rect(1040 + 0*10, 300 - newpops1[0], 10, newpops1[0]); // 1980
     text(pops1[0], 1040 + 0*10, 290 - newpops1[0]); 
     
@@ -766,36 +783,44 @@ void createPlots(String i1, String i2) {//float[] pops, float max, float min) {
     rect( 1040 + 21*10 , 300 - newpops1[3], 10, newpops1[3]); // 2010
     text(pops1[3], 1040 + 21*10, 290 - newpops1[3]); 
     
-    rect( 1040 + 28*10 , 300 - newpops1[4], 10, newpops1[4]/10); // area
+    rect( 1040 + 28*10 , 300 - newpops1[4], 10, newpops1[4]); // area
     text(pops1[4], 1040 + 28*10, 290 - newpops1[4]); 
     
     
-    fill(0,0,255); // blue
+    fill(chartColor2); // blue
     rect( 1040 + 1*10, 300 - newpops2[0], 10, newpops2[0]); //1980
-    text(pops2[0], 1040 + 4*10, 290 - newpops2[0]); 
+    text(pops2[0], 1040 + 3*10, 290 - newpops2[0]); 
     
     rect( 1040 + 8*10, 300 - newpops2[1], 10, newpops2[1]); // 1990
-    text(pops2[1], 1040 + 11*10, 290 - newpops2[1]); 
+    text(pops2[1], 1040 + 10*10, 290 - newpops2[1]); 
     
     rect( 1040 + 15*10, 300 - newpops2[2], 10, newpops2[2]); // 2000
-    text(pops2[2], 1040 + 18*10, 290 - newpops2[2]); 
+    text(pops2[2], 1040 + 17*10, 290 - newpops2[2]); 
     
     rect( 1040 + 22*10, 300 - newpops2[3], 10, newpops2[3]); // 2010
-    text(pops2[3], 1040 + 25*10, 290 - newpops2[3]); 
+    text(pops2[3], 1040 + 24*10, 290 - newpops2[3]); 
     
     rect( 1040 + 29*10, 300 - newpops2[4], 10, newpops2[4]); // area
-    text(pops2[4], 1040 + 32*10, 290 - newpops2[4]); 
+    text(pops2[4], 1055 + 31*10, 300 - newpops2[4]); 
     
     
     fill(0);
     text("1980 pop", 1050, 310); 
-    text("1990 pop", 1110, 310);
+    text("1990 pop", 1120, 310);
     text("2000 pop", 1190, 310);
     text("2010 pop", 1260, 310);
-    text("area", 1320, 310);
+    text("area", 1330, 310);
     
   }
   
+  // add lengends for islands 
+  fill(chartColor1); // red
+  rect(1030, 330, 10, 10); // area
+  text("Island1(left)", 1070, 332); 
+  
+  fill(chartColor2); // blue
+  rect(1030, 340, 10, 10); // area
+  text("Island2(right)",1072, 345); 
 
   
 }
