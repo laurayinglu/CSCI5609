@@ -80,4 +80,25 @@ static class TableUtils {
      }
   }
   
+  // idx 2,3, 4, 5, 6(area)
+  static public float[] getPops(Table t, String island) {
+    float[] pops = new float[5];
+    for (int r=0; r < t.getRowCount(); r++) {
+       TableRow rowValues = t.getRow(r);
+       if (rowValues.getString(0) == island) {
+         pops[0] = rowValues.getFloat(2);
+         pops[1] = rowValues.getFloat(3);
+         pops[2] = rowValues.getFloat(4);
+         pops[3] = rowValues.getFloat(5);
+         pops[4] = rowValues.getFloat(6);
+         println("pops", pops[0], pops[1], pops[2], pops[3], pops[4]);
+         return pops;
+       }
+       
+     }
+     
+     return pops;
+    
+  }
+  
 }
