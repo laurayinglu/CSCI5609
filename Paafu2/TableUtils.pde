@@ -85,7 +85,9 @@ static class TableUtils {
     float[] pops = new float[5];
     for (int r=0; r < t.getRowCount(); r++) {
        TableRow rowValues = t.getRow(r);
+       
        if (rowValues.getString(0) == island) {
+         
          pops[0] = rowValues.getFloat(2);
          pops[1] = rowValues.getFloat(3);
          pops[2] = rowValues.getFloat(4);

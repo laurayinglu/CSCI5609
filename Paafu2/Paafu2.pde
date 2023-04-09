@@ -28,6 +28,8 @@ String selectedMunicipality = "Romanum";
 String islandInput1 = "";
 String islandInput2 = "";
 
+String selectedState = "";
+
 color chartColor1 = color(255);
 color chartColor2 = color(255);
 
@@ -60,6 +62,13 @@ int[] buttonOrDropList = new int[]{0, 1, 1, 0, 1};
 String info = "";
 float infoTableX = 0.0;
 float infoTableY = 0.0;
+
+float imgX = 0;
+float imgY = 0;
+
+PImage islandImg;
+String imgPath = "micro.jpeg";
+boolean showIslandImg = false;
 
 // === PROCESSING BUILT-IN FUNCTIONS ===
 
@@ -97,29 +106,22 @@ void setup() {
   // set the dropdown lists
   frameRate(30);
   controlP5 = new ControlP5(this);
-  //overview = controlP5.addDropdownList("Micronesian Overview",50,50,100,150);
 
   controlP5.addButton("micronesianOverview")
     .setValue(0)
     .setPosition(50, 50)
     .setSize(120, 25)
-    .activateBy(ControlP5.PRESSED)
-    ;
+    .activateBy(ControlP5.PRESSED);
 
   controlP5.addButton("Filter")
     .setValue(0)
     .setPosition(290, 50)
-    .setSize(120, 25)
-    ;
-
-  stateDropdown = controlP5.addDropdownList("State", 180, 50, 100, 150);
-
-  customizeDropdown(stateDropdown, "state");
+    .setSize(120, 25);
 
   // set the table for selected municipality
   infoText = controlP5.addTextarea("txt")
     .setPosition(0, 0)
-    .setSize(200, 100)
+    .setSize(330, 170)
     .setLineHeight(14)
     .disableColorBackground()
   ;
@@ -145,9 +147,11 @@ void setup() {
   for (int i=0; i<locationTable.getRowCount(); i++) {
       TableRow rowData = locationTable.getRow(i);
       String municipalityName = rowData.getString("Municipality");
+      println(municipalityName);
       inputDropdown1.addItem(municipalityName, i);
       inputDropdown2.addItem(municipalityName, i);
   }
+  
   
   controlP5.addButton("Compare")
     .setPosition(1290, 55)
@@ -160,6 +164,18 @@ void setup() {
     .setSize(80, 15)
     .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
   ;
+
+  stateDropdown = controlP5.addDropdownList("State")
+   .setPosition(180, 50)
+   .setSize(100, 20)
+   .setBarHeight(30)
+   .setItemHeight(20)
+  ;
+                  
+  stateDropdown.addItem("YAP", 0);
+  stateDropdown.addItem("CHU", 1);
+  stateDropdown.addItem("KOS", 2);
+  stateDropdown.addItem("POH", 3);
   
   float h = max(max(maxPop1980, maxPop2000, maxPop2010), maxPop1994);
   float m = min(min(minPop1980, minPop2000, minPop2010), minPop1994);
@@ -182,10 +198,7 @@ void setup() {
   
   filterChart.getColor().setBackground(color(0, 50));
   filterChart.hide(); 
-  
-  
 
-  
 }
 
 
@@ -202,9 +215,12 @@ void draw() {
   filterclicked();
 
   createPlots(islandInput1, islandInput2);
-
+  
+  islandImg = loadImage(imgPath);
+  if (showIslandImg)
+    image(islandImg, imgX, imgY, 330, 100);
+   
 }
-
 
 
 void filterclicked() {
@@ -344,6 +360,7 @@ void island1(ControlEvent event) {
   }
 }
 
+
 void island2(ControlEvent event) {
   String[] munData = getColumnData(populationTable, "Municipality");
   if (event.isFrom("island2")) {
@@ -351,6 +368,15 @@ void island2(ControlEvent event) {
     println("Selected island2 input: " + munData[(int)event.getController().getValue()]);
   }
 }
+
+// get the state selected
+void State(ControlEvent event) { //<>//
+  String[] states = {"YAP", "CHU", "KOS", "POH"};
+  if (event.isFrom("State")) {
+    println("Selected State: " + states[(int)event.getController().getValue()]);
+  }
+}
+
 
 public void Compare(int theValue) {
   println("Compare button is clicked");
@@ -384,17 +410,17 @@ void showCompareRes(String island1, String island2) {
 }
 
 
-// for cutomize the dropdown menu
+// for customize the dropdown menu
 void customizeDropdown(DropdownList ddl, String name) {
   ddl.setBackgroundColor(color(190));
   ddl.setItemHeight(25);
   ddl.setBarHeight(25);
 
   if (name == "state") {
-    ddl.addItem("YAP", 1);
-    ddl.addItem("CHU", 2);
-    ddl.addItem("KOS", 3);
-    ddl.addItem("POH", 4);
+    ddl.addItem("YAP", 0);
+    ddl.addItem("CHU", 1);
+    ddl.addItem("KOS", 2);
+    ddl.addItem("POH", 3);
   }
 
   ddl.setColorBackground(color(60));
@@ -613,12 +639,21 @@ void mousePressed() {
   if (highlightedMunicipality != "") {
     selectedMunicipality = highlightedMunicipality;
     // print in the terminal
-    println("Selected: " + selectedMunicipality + "State: ");
+    println("Selected: " + selectedMunicipality + " State");
 
     // print info table of selectedMunicipality
     // show info of highlightedMunicipality
     //text(highlightedMunicipality, mouseX, mouseY + 10);
-    info = "Municipality Name: " + selectedMunicipality + "\n" + "(Lat, Long): (" + getLatitude(selectedMunicipality) + "," + getLongitude(selectedMunicipality) + ") \n";
+    String name = "Municipality Name: " + selectedMunicipality + "\n";
+    String loc = "(Lat, Long): (" + getLatitude(selectedMunicipality) + "," + getLongitude(selectedMunicipality) + ") \n";
+    String area = "Area: " + getArea(selectedMunicipality) + "\n";
+    
+    // get 4 years' pops
+    float[] pops = getCensus(selectedMunicipality);
+    String state = "State: " + getState(selectedMunicipality) + "\n";;
+    String pops4 = "[1980, 1994, 2000, 2010] Census: [" + pops[0] + ", " + pops[1] + ", " + pops[2] + ", " + pops[3] + "] \n";
+    info = name + state + loc + pops4 + area;
+    
     infoTableX = mouseX + 5;
     infoTableY = mouseY + 20;
 
@@ -627,8 +662,16 @@ void mousePressed() {
     infoText.setColorBackground(color(87, 100));
     infoText.setColorForeground(color(255, 100));
     infoText.setPosition(infoTableX, infoTableY);
+    imgPath = "./islandsImgs/" + selectedMunicipality + ".jpeg";
+    //println(imgPath);
+    islandImg = loadImage(imgPath);
+    showIslandImg = true;
+    imgX = infoTableX;
+    imgY = infoTableY + 70;
+
   } else {
     infoText.setText("");
+    showIslandImg = false;
     //infoText.setColor(50);
     infoText.disableColorBackground();
   }
@@ -657,6 +700,28 @@ float getLatitude(String municipalityName) {
 float getLongitude(String municipalityName) {
   TableRow r = locationTable.findRow(municipalityName, "Municipality");
   return r.getFloat("Longitude");
+}
+
+int getArea(String municipalityName) {
+  TableRow popRow = populationTable.findRow(municipalityName, "Municipality");
+  int area = popRow.getInt("Area");
+  return area;
+}
+
+float[] getCensus(String municipalityName) {
+  TableRow popRow = populationTable.findRow(municipalityName, "Municipality");
+  float[] census = new float[4];
+  census[0] = popRow.getFloat("Population 1980 Census");
+  census[1] = popRow.getFloat("Population 1994 Census");
+  census[2] = popRow.getFloat("Population 2000 Census");
+  census[3] = popRow.getFloat("Population 2010 Census");
+  return census;
+}
+
+String getState(String municipalityName) {
+  TableRow popRow = populationTable.findRow(municipalityName, "Municipality");
+  String state = popRow.getString("State");
+  return state;
 }
 
 float getArea01(String municipalityName) {
@@ -742,22 +807,6 @@ void createPlots(String i1, String i2) {//float[] pops, float max, float min) {
     }
     
   }
-  
-  //if(pops1[4] > 0 && areaMax != areaMin) {
-  //  println(areaMax, areaMin);
-  //  newpops1[4] = 10 + ((yrange - 10) / (areaMax - areaMin)) * (pops1[4] - areaMin);
-  //}
-  
-  //if(pops2[4]>0 && areaMax != areaMin) {
-  //  newpops2[4] = 10 + ((yrange - 10) / (areaMax - areaMin)) * (pops2[4] - areaMin);
-  //}
-  
-  println("pops1", pops1[0], pops1[1], pops1[2], pops1[3], pops1[4]);
-  println("newpops1", newpops1[0], newpops1[1], newpops1[2], newpops1[3], newpops1[4]);
-
-
-  println("pops2", pops2[0], pops2[1], pops2[2], pops2[3], pops2[4]);
-  println("newpops2", newpops2[0], newpops2[1], newpops2[2], newpops2[3], newpops2[4]);
 
   
   if (pops1[4] > 0 && pops2[4] > 0){
@@ -830,7 +879,7 @@ void createPlots(String i1, String i2) {//float[] pops, float max, float min) {
     
     fill(0);
     text("1980 pop", 1050, 310); 
-    text("1990 pop", 1120, 310);
+    text("1994 pop", 1120, 310);
     text("2000 pop", 1190, 310);
     text("2010 pop", 1260, 310);
     text("area", 1330, 310);
