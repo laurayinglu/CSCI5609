@@ -117,6 +117,8 @@ void setup() {
   // do any other data processing, e.g., finding mins and maxes for data variables
   computeDerivedData();
 
+  computePopDensityData();
+
   // these coordinates define a rectangular region for the map that happens to be
   // centered around Micronesia
   panZoomMap = new PanZoomMap(5.2, 138, 10.0, 163.1);
@@ -604,21 +606,61 @@ void showLegends(String popYear, float minPopYear, float maxPopYear, color lowes
   textSize(10);
   showPopLegend(popYear, minPopYear, maxPopYear, lowestPopulationColor, highestPopulationColor);
   showAreaLegend(minRadius, maxRadius);
+  showDenLegend();
 }
 
 // show legends of population deensity of selected year
-void showDenLegend(String popYear) {
+void showDenLegend() {
+    text("Density of " + selectedYear, 1120, 540);
     noFill();
     strokeWeight(2);
     stroke(0,0,0);
     //int(popuYear)
-    //for (int j = 0; j < int(popuYearDen); j++) {
-    //  float angle = random(TWO_PI);
-    //  float r = sqrt(random(1)) * radius;
-    //  float x = screenX + r * cos(angle);
-    //  float y = screenY + r * sin(angle);
-    //  point(x, y);
-    //}
+    float maxNumDots = 0;
+    float minNumDots = 0;
+    float maxDen = 0;
+    float minDen = 0;
+    if (selectedYear == "Population 1980 Census") {
+      maxNumDots = maxPopYear1980Den*7;
+      minNumDots = minPopYear1980Den*7;
+      maxDen = maxPopYear1980Den;
+      minDen = minPopYear1980Den;
+    } else if (selectedYear == "Population 1994 Census") {
+      maxNumDots = maxPopYear1994Den*7;
+      minNumDots = minPopYear1994Den*7;
+      maxDen = maxPopYear1994Den;
+      minDen = minPopYear1994Den;
+    } else if (selectedYear == "Population 2000 Census") {
+      maxNumDots = maxPopYear2000Den*7; 
+      minNumDots = minPopYear2000Den*7;
+      maxDen = maxPopYear2000Den;
+      minDen = minPopYear2000Den;
+    } else { // 2010
+      maxNumDots = maxPopYear2010Den*7;
+      minNumDots = minPopYear2010Den*7;
+      maxDen = maxPopYear2010Den;
+      minDen = minPopYear2010Den;
+    }
+    println("max and min are", maxNumDots, minNumDots);
+    int radius = 20;
+    int startX = 1060;
+    int startY = 580;
+    float diff = (maxNumDots - minNumDots) / 5;
+    text(maxDen, startX, 610);
+    for (int d = 0; d < 5; d++) {
+      // circle(startX, startY, radius);
+      // println("curr nums is", d, int(maxNumDots - diff*d));
+      for (int j = 0; j < int(maxNumDots - diff*d); j++) {
+        float angle = random(TWO_PI);
+        float r = sqrt(random(1)) * radius;
+        float x = startX + r * cos(angle);
+        float y = startY + r * sin(angle);
+        point(x, y);
+      }
+      
+      startX += 53;
+    }
+    text(minDen, 1280, 610);
 }
 
 void showAreaLegend(float minRadius, float maxRadius) {
@@ -982,7 +1024,7 @@ void computeDerivedData() {
 // find min and max population density of 4 years
 void computePopDensityData() {
   for(int i = 0;i<populationTable.getRowCount();i++){
-    TableRow rowData = locationTable.getRow(i);
+    TableRow rowData = populationTable.getRow(i);
     float den1980 = rowData.getFloat("Population 1980 Census")/rowData.getFloat("Area");
     if (den1980<minPopYear1980Den){
       minPopYear1980Den = den1980;
