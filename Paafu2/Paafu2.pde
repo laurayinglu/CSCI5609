@@ -64,7 +64,8 @@ DropdownList filter;
 
 DropdownList inputDropdown1;
 DropdownList inputDropdown2;
-
+DropdownList popInputDropdown1;
+DropdownList popInputDropdown2;
 Chart compareChart;
 Chart filterChart;
 
@@ -82,6 +83,7 @@ String selectedyearOption = "1980";
 String selectedorderOption = "Ascending";
 
 String[] items = {"YAP", "CHU", "KOS", "POH"};
+String[] censusYears ={"Population 1980 Census","Population 1994 Census","Population 2000 Census","Population 2010 Census"};
 
 String[] muniNames; 
 ArrayList<Float>[] yearData; 
@@ -182,7 +184,7 @@ void setup() {
      .setBarHeight(25)
      .setItemHeight(25)
      .addItems(items)
-     .setCaptionLabel("Select a state");
+     .setCaptionLabel("Select a state").close();
      
      
  controlP5.addButton("ClearState")
@@ -208,14 +210,15 @@ void setup() {
     .setPosition(1020, 55)
     .setSize(120, 200)
     .setBarHeight(30)
-    .setItemHeight(25)
+    .setItemHeight(25).close()
+    
   ;
 
   inputDropdown2 = controlP5.addDropdownList("island2")
    .setPosition(1150, 55)
    .setSize(120, 200)
    .setBarHeight(30)
-   .setItemHeight(25)
+   .setItemHeight(25).close()
   ;
   
   for (int i=0; i<locationTable.getRowCount(); i++) {
@@ -238,6 +241,34 @@ void setup() {
     .setSize(80, 15)
     .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
   ;
+
+  popInputDropdown1 = controlP5.addDropdownList("pop1")
+    .setPosition(1020, 390)
+    .setSize(120, 250)
+    // .setBarHeight(30)
+    .setItemHeight(25)
+    .addItems(censusYears)
+    .setCaptionLabel("Select a census year").close();
+
+  ;
+
+  popInputDropdown2 = controlP5.addDropdownList("pop2")
+   .setPosition(1150, 390)
+   .setSize(120, 250)
+  //  .setBarHeight(30)
+   .setItemHeight(25)
+   .addItems(censusYears)
+   .setCaptionLabel("Select a census year").close();
+  ;
+  
+  // for (int i=0; i<locationTable.getRowCount(); i++) {
+  //     // TableRow rowData = locationTable.getRow(i);
+  //     // String municipalityName = rowData.getString("Municipality");
+  //     // println(municipalityName);
+
+  //     popInputDropdown1.addItem(municipalityName, i);
+  //     popInputDropdown2.addItem(municipalityName, i);
+  // }
 
 
 
