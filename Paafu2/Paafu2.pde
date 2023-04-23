@@ -1,4 +1,4 @@
-/* CSci-5609 Assignment 2: Visualization of Paafu Kinship Ties for the Islands of Micronesia //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+/* CSci-5609 Assignment 2: Visualization of Paafu Kinship Ties for the Islands of Micronesia //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
  */
 
 // === GLOBAL DATA VARIABLES ===
@@ -20,6 +20,7 @@ float minPop2000, maxPop2000;
 float minPop2010, maxPop2010;
 float minArea, maxArea;
 String selectedYear = "";
+boolean showPopDen = false;
 
 // Graphics and UI variables
 PanZoomMap panZoomMap;
@@ -29,7 +30,7 @@ String selectedMunicipality = "Romanum";
 String islandInput1 = "";
 String islandInput2 = "";
 
-String selectedState = "";
+String selectedState = "all";
 
 color chartColor1 = color(255);
 color chartColor2 = color(255);
@@ -54,6 +55,8 @@ DropdownList inputDropdown2;
 
 Chart compareChart;
 Chart filterChart;
+
+//Button showPopDenBtn = new Button();
 
 // Button Status after click 'Filter'
 boolean unclickFilterButtons = true;
@@ -147,6 +150,29 @@ void setup() {
     .setValue(0)
     .setPosition(520, 50)
     .setSize(60, 25);
+    
+  controlP5.addButton("ShowPopDensity")
+      .setValue(0)
+      .setPosition(310, 100)
+      .setSize(150, 25)
+      .setCaptionLabel("Show Population density");
+      
+    
+  controlP5.addDropdownList("State")
+     .setPosition(600, 50)
+     .setSize(100, 190)
+     .setBarHeight(25)
+     .setItemHeight(25)
+     .addItems(items)
+     .setCaptionLabel("Select a state");
+     
+     
+ controlP5.addButton("ClearState")
+    .setValue(0)
+    .setPosition(720, 50)
+    .setSize(100, 25)
+    .setCaptionLabel("Clear state selection");
+    
 
   // set the table for selected municipality
   infoText = controlP5.addTextarea("txt")
@@ -177,7 +203,7 @@ void setup() {
   for (int i=0; i<locationTable.getRowCount(); i++) {
       TableRow rowData = locationTable.getRow(i);
       String municipalityName = rowData.getString("Municipality");
-      // println(municipalityName);
+      println(municipalityName);
       inputDropdown1.addItem(municipalityName, i);
       inputDropdown2.addItem(municipalityName, i);
   }
@@ -195,13 +221,7 @@ void setup() {
     .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
   ;
 
-  controlP5.addDropdownList("State")
-     .setPosition(180, 50)
-     .setSize(120, 190)
-     .setBarHeight(30)
-     .setItemHeight(25)
-     .addItems(items)
-     .setCaptionLabel("Select a state");
+
 
   
 }
@@ -214,7 +234,7 @@ void draw() {
   img.resize(1400, 800);
   background(img);
 
-  overviewUI(selectedYear);
+  overviewUI(selectedYear, showPopDen);
 
   if(compareClicked){
     createPlots(islandInput1, islandInput2);
@@ -222,7 +242,7 @@ void draw() {
   
   islandImg = loadImage(imgPath);
   if (showIslandImg)
-    image(islandImg, imgX, imgY, 330, 100);
+    image(islandImg, imgX, imgY, 330, 100); //<>//
    
 }
 
@@ -231,7 +251,7 @@ void island1(ControlEvent event) {
   String[] munData = getColumnData(populationTable, "Municipality");
   if (event.isFrom("island1")) {
     islandInput1 = munData[(int)event.getController().getValue()];
-    // println("Selected island1 input: " + munData[(int)event.getController().getValue()]);
+    println("Selected island1 input: " + munData[(int)event.getController().getValue()]);
   }
 }
 
@@ -240,23 +260,23 @@ void island2(ControlEvent event) {
   String[] munData = getColumnData(populationTable, "Municipality");
   if (event.isFrom("island2")) {
     islandInput2 = munData[(int)event.getController().getValue()];
-    //println("Selected island2 input: " + munData[(int)event.getController().getValue()]);
+    println("Selected island2 input: " + munData[(int)event.getController().getValue()]);
   }
 }
 
 // get the state selected
 void State(ControlEvent event) { //<>//
-  // String[] states = {"YAP", "CHU", "KOS", "POH"};
+  String[] states = {"YAP", "CHU", "KOS", "POH"};
   
   if (event.isFrom("State")) {
     selectedState = states[(int)event.getController().getValue()];
-    //println("Selected State: " + selectedState);
+    println("Selected State: " + selectedState);
   }
 }
 
 // event handler when clicking compare button
 public void Compare(int theValue) {
-  //println("Compare button is clicked");
+  println("Compare button is clicked");
   // call functions to show compared results
   compareClicked =true;
 
@@ -266,7 +286,7 @@ public void Compare(int theValue) {
 
 // event handler when clicking clear button
 public void Clear(int theValue) {
-  //println("clear button is clicked");
+  println("clear button is clicked");
   compareChart.hide(); // hide the compare res chart
   islandInput1 = "";
   islandInput2 = "";
@@ -279,32 +299,41 @@ public void Clear(int theValue) {
   //inputDropdown2.clear();
 }
 
+public void ClearState(int theValue) {
+  selectedState = "all";
+}
+
 // event handler when clicking 1980 button
 public void Year1980(int theValue) {
-  //println("1980 button is clicked");
+  println("1980 button is clicked");
   // call functions to show compared results
   selectedYear = "Population 1980 Census";
 }
 
 // event handler when clicking 1980 button
 public void Year1994(int theValue) {
-  //println("1994 button is clicked");
+  println("1994 button is clicked");
   // call functions to show compared results
   selectedYear = "Population 1994 Census";
 }
 
 // event handler when clicking 1980 button
 public void Year2000(int theValue) {
-  //println("2000 button is clicked");
+  println("2000 button is clicked");
   // call functions to show compared results
   selectedYear = "Population 2000 Census";
 }
 
 // event handler when clicking 1980 button
 public void Year2010(int theValue) {
-  //println("2010 button is clicked");
+  println("2010 button is clicked");
   // call functions to show compared results
   selectedYear = "Population 2010 Census";
+}
+
+public void ShowPopDensity(int theValue) {
+  //showPopDenBtn.show();
+  showPopDen = true;
 }
 
 
@@ -341,11 +370,11 @@ void customizeDropdown(DropdownList ddl, String name) {
 // function colorA will receive changes from
 // controller with name Micronesian Overview
 public void micronesianOverview(int theValue) {
-  //println("a button event from micronesianOverview: "+ theValue); // 0
+  println("a button event from micronesianOverview: "+ theValue); // 0
 }
 
 
-void showMap(String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius) {
+void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius) {
   // Municipalities should highlight (i.e., change appearance in some way) whenever the mouse is hovering
   // over them so the user knows something will happen if they click.  If they do click while a municipality
   // is highlighted, then that municipality becomes the selectedMunicipality and the visualization should
@@ -361,9 +390,23 @@ void showMap(String popYear, float minPopYear, float maxPopYear, color lowestPop
   float mapX2 = panZoomMap.longitudeToScreenX(163.1);
   float mapY2 = panZoomMap.latitudeToScreenY(10.0);
   rect(mapX1, mapY1, mapX2, mapY2);
+  int rows = 0;
+  int[] RowIndicesForState = TableUtils.findRowIndicesForState(populationTable, selectedState);
   
-  for (int i=0; i<locationTable.getRowCount(); i++) {
-    TableRow rowData = locationTable.getRow(i);
+  if (selectedState=="all"){
+    rows = locationTable.getRowCount();
+  } else {
+    rows = RowIndicesForState.length;
+  }
+  
+  for (int i=0; i<rows; i++) {
+    int idx = 0;
+    if(selectedState=="all"){
+      idx = i;
+    } else {
+      idx = RowIndicesForState[i];
+    }
+    TableRow rowData = locationTable.getRow(idx);
     String municipalityName = rowData.getString("Municipality");
     float latitude = rowData.getFloat("Latitude");
     float longitude = rowData.getFloat("Longitude");
@@ -375,14 +418,20 @@ void showMap(String popYear, float minPopYear, float maxPopYear, color lowestPop
     // municipality in the population table
     TableRow popRow = populationTable.findRow(municipalityName, "Municipality");
     int popuYear = popRow.getInt(popYear);
-    //println(popuYear);
     int area = popRow.getInt("Area");
 
     // normalize data values to a 0..1 range
     float popuYear_01;
 
     popuYear_01 = (popuYear - minPopYear) / (maxPopYear - minPopYear);
-    //println("popuyear_01 is"+popuYear_01);
+    
+    // encode population density with color
+    if (showDen) {
+      // 
+      //popuYear_01 = (popuYear - minPopYear) / (maxPopYear - minPopYear);
+    }
+
+    
     float area_01 = (area - minArea) / (maxArea - minArea);
 
     // two examples using lerp*() to map the data values to changes in visual attributes
@@ -416,7 +465,7 @@ void showMap(String popYear, float minPopYear, float maxPopYear, color lowestPop
 }
 
 // when user clicks "Micronesia overview button"
-void overviewUI(String popYear) {
+void overviewUI(String popYear, boolean showDen) {
 
   // defined in screen space, so the circles will be the same size regardless of zoom level
   float minRadius = 3;
@@ -451,7 +500,7 @@ void overviewUI(String popYear) {
   }
 
   // show the map on the left side
-  showMap(popYear, minPopYear, maxPopYear, lowestPopulationColor, highestPopulationColor, minRadius, maxRadius);
+  showMap(showDen, popYear, minPopYear, maxPopYear, lowestPopulationColor, highestPopulationColor, minRadius, maxRadius);
 
   fill(250);
   stroke(111, 87, 0);
@@ -539,7 +588,7 @@ void showPopLegend(String popYear, float minPopYear, float maxPopYear, color low
 
 void keyPressed() {
   if (key == ' ') {
-    //println("current scale: ", panZoomMap.scale, " current translation: ", panZoomMap.translateX, "x", panZoomMap.translateY);
+    println("current scale: ", panZoomMap.scale, " current translation: ", panZoomMap.translateX, "x", panZoomMap.translateY);
   }
 }
 
@@ -548,7 +597,7 @@ void mousePressed() {
   if (highlightedMunicipality != "") {
     selectedMunicipality = highlightedMunicipality;
     // print in the terminal
-    //println("Selected: " + selectedMunicipality + " State");
+    println("Selected: " + selectedMunicipality + " State");
 
     // print info table of selectedMunicipality
     // show info of highlightedMunicipality
@@ -814,41 +863,46 @@ void createPlots(String i1, String i2) {//float[] pops, float max, float min) {
 
 void loadRawDataTables() {
   locationTable = loadTable("FSM-municipality-locations.csv", "header");
-  //println("Location table:", locationTable.getRowCount(), "x", locationTable.getColumnCount());
+  println("Location table:", locationTable.getRowCount(), "x", locationTable.getColumnCount());
 
   populationTable = loadTable("FSM-municipality-populations.csv", "header");
-  //println("Population table:", populationTable.getRowCount(), "x", populationTable.getColumnCount());
+  println("Population table:", populationTable.getRowCount(), "x", populationTable.getColumnCount());
 }
 
 void computeDerivedData() {
   // lookup min/max data ranges for the variables we will want to depict
   minLatitude = TableUtils.findMinFloatInColumn(locationTable, "Latitude");
   maxLatitude = TableUtils.findMaxFloatInColumn(locationTable, "Latitude");
-  //println("Latitude range:", minLatitude, "to", maxLatitude);
+  println("Latitude range:", minLatitude, "to", maxLatitude);
 
   minLongitude = TableUtils.findMinFloatInColumn(locationTable, "Longitude");
   maxLongitude = TableUtils.findMaxFloatInColumn(locationTable, "Longitude");
-  //println("Longitude range:", minLongitude, "to", maxLongitude);
+  println("Longitude range:", minLongitude, "to", maxLongitude);
 
   minPop1980 = TableUtils.findMinFloatInColumn(populationTable, "Population 1980 Census");
   maxPop1980 = TableUtils.findMaxFloatInColumn(populationTable, "Population 1980 Census");
-  //println("Pop 1980 range:", minPop1980, "to", maxPop1980);
+  println("Pop 1980 range:", minPop1980, "to", maxPop1980);
 
   minPop1994 = TableUtils.findMinFloatInColumn(populationTable, "Population 1994 Census");
   maxPop1994 = TableUtils.findMaxFloatInColumn(populationTable, "Population 1994 Census");
-  //println("Pop 1994 range:", minPop1994, "to", maxPop1994);
+  println("Pop 1994 range:", minPop1994, "to", maxPop1994);
 
   minPop2000 = TableUtils.findMinFloatInColumn(populationTable, "Population 2000 Census");
   maxPop2000 = TableUtils.findMaxFloatInColumn(populationTable, "Population 2000 Census");
-  //println("Pop 2000 range:", minPop2000, "to", maxPop2000);
+  println("Pop 2000 range:", minPop2000, "to", maxPop2000);
 
   minPop2010 = TableUtils.findMinFloatInColumn(populationTable, "Population 2010 Census");
   maxPop2010 = TableUtils.findMaxFloatInColumn(populationTable, "Population 2010 Census");
-  //println("Pop 2010 range:", minPop2010, "to", maxPop2010);
+  println("Pop 2010 range:", minPop2010, "to", maxPop2010);
 
   minArea = TableUtils.findMinFloatInColumn(populationTable, "Area");
   maxArea = TableUtils.findMaxFloatInColumn(populationTable, "Area");
-  //println("Area range:", minArea, "to", maxArea);
+  println("Area range:", minArea, "to", maxArea);
+}
+
+// find min and max population density of 4 years
+void computePopDensityData() {
+  
 }
 
 
