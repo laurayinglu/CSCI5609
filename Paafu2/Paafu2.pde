@@ -18,6 +18,12 @@ float minPop1980, maxPop1980;
 float minPop1994, maxPop1994;
 float minPop2000, maxPop2000;
 float minPop2010, maxPop2010;
+
+float minPop1980Den, maxPop1980Den;
+float minPop1994Den, maxPop1994Den;
+float minPop2000Den, maxPop2000Den;
+float minPop2010Den, maxPop2010Den;
+
 float minArea, maxArea;
 String selectedYear = "";
 boolean showPopDen = false;
@@ -157,7 +163,13 @@ void setup() {
       .setSize(150, 25)
       .setCaptionLabel("Show Population density");
       
-    
+  controlP5.addButton("resetShowPop")
+      .setValue(0)
+      .setPosition(310, 130)
+      .setSize(150, 25)
+      .setCaptionLabel("Reset show Pop Density");
+      
+      
   controlP5.addDropdownList("State")
      .setPosition(600, 50)
      .setSize(100, 190)
@@ -230,7 +242,7 @@ void draw() {
   // clear the screen
   background(230);
   PImage img;
-  img = loadImage("micro.jpeg");
+  img = loadImage("micro.jpeg"); //<>//
   img.resize(1400, 800);
   background(img);
 
@@ -238,11 +250,11 @@ void draw() {
 
   if(compareClicked){
     createPlots(islandInput1, islandInput2);
-    }
+   }
   
   islandImg = loadImage(imgPath);
   if (showIslandImg)
-    image(islandImg, imgX, imgY, 330, 100); //<>//
+    image(islandImg, imgX, imgY, 330, 100);
    
 }
 
@@ -336,6 +348,10 @@ public void ShowPopDensity(int theValue) {
   showPopDen = true;
 }
 
+public void resetShowPop(int theValue) {
+  showPopDen = false;
+}
+
 
 // comparison results of two islands - user inputs after clicking compare button
 void showCompareRes(String island1, String island2) {
@@ -374,7 +390,9 @@ public void micronesianOverview(int theValue) {
 }
 
 
-void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius) {
+void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear, 
+            color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius,
+            float minPopYearDen, float maxPopYearDen) {
   // Municipalities should highlight (i.e., change appearance in some way) whenever the mouse is hovering
   // over them so the user knows something will happen if they click.  If they do click while a municipality
   // is highlighted, then that municipality becomes the selectedMunicipality and the visualization should
@@ -419,16 +437,17 @@ void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear
     TableRow popRow = populationTable.findRow(municipalityName, "Municipality");
     int popuYear = popRow.getInt(popYear);
     int area = popRow.getInt("Area");
+    float popuYearDen = popuYear/area;
 
     // normalize data values to a 0..1 range
     float popuYear_01;
-
-    popuYear_01 = (popuYear - minPopYear) / (maxPopYear - minPopYear);
-    
+     println("showden is", showDen);
     // encode population density with color
     if (showDen) {
-      // 
-      //popuYear_01 = (popuYear - minPopYear) / (maxPopYear - minPopYear);
+      // it's representing the population density = pop/area
+      popuYear_01 = (popuYearDen - minPopYearDen) / (maxPopYearDen - minPopYearDen);
+    } else {
+      popuYear_01 = (popuYear - minPopYear) / (maxPopYear - minPopYear);
     }
 
     
@@ -449,13 +468,32 @@ void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear
     // highlight the circle if highlightedMunicipality == its name
     // also show detailed info of hovered municipality
     if (highlightedMunicipality == municipalityName) {
+      if(showDen) {
+        radius = 20;
+      }
       fill(0, 0, 255);
       circle(screenX, screenY, radius);
       textAlign(LEFT, CENTER);
       float xTextOffset = radius + 4; // move the text to the right of the circle
       text(municipalityName, screenX + xTextOffset, screenY);
     } else {
+      if(showDen) {
+        radius = 20;
+      }
       circle(screenX, screenY, radius);
+      noFill();
+      strokeWeight(1);
+      stroke(0);
+      for (int j = 0; j < 20; j++) {
+        float angle = random(TWO_PI);
+        float r = sqrt(random(1)) * radius;
+        float x = screenX + r * cos(angle);
+        float y = screenY + r * sin(angle);
+        point(x, y);
+      }
+    
+      //noLoop();
+  
       textAlign(LEFT, CENTER);
       float xTextOffset = radius + 4; // move the text to the right of the circle
       fill(111, 87, 0);
@@ -476,31 +514,42 @@ void overviewUI(String popYear, boolean showDen) {
   
   float maxPopYear;
   float minPopYear;
+  
+  float maxPopYearDen;
+  float minPopYearDen;
 
   if (popYear == "Population 2010 Census") {
     maxPopYear = maxPop2010;
     minPopYear = minPop2010;
+    maxPopYearDen = maxPop2010Den;
+    minPopYearDen = minPop2010Den;
     lowestPopulationColor = color(255, 224, 121);
     highestPopulationColor = color(232, 81, 21);
   } else if (popYear == "Population 2000 Census") {
     maxPopYear = maxPop2000;
     minPopYear = minPop2000;
+    maxPopYearDen = maxPop2000Den;
+    minPopYearDen = minPop2000Den;
     lowestPopulationColor = color(0, 255, 0); // rgb
     highestPopulationColor = color(255, 0, 255);
   } else if (popYear == "Population 1980 Census") {
     maxPopYear = maxPop1980;
     minPopYear = minPop1980;
+    maxPopYearDen = maxPop1980Den;
+    minPopYearDen = minPop1980Den;
     lowestPopulationColor = color(255, 0, 0);
     highestPopulationColor = color(0, 255, 255);
   } else { // 1994
     maxPopYear = maxPop1994;
     minPopYear = minPop1994;
+    maxPopYearDen = maxPop1994Den;
+    minPopYearDen = minPop1994Den;
     lowestPopulationColor = color(0, 0, 255);
     highestPopulationColor = color(255, 255, 0);
   }
 
   // show the map on the left side
-  showMap(showDen, popYear, minPopYear, maxPopYear, lowestPopulationColor, highestPopulationColor, minRadius, maxRadius);
+  showMap(showDen, popYear, minPopYear, maxPopYear, lowestPopulationColor, highestPopulationColor, minRadius, maxRadius, minPopYearDen, maxPopYearDen);
 
   fill(250);
   stroke(111, 87, 0);
@@ -689,10 +738,6 @@ float getArea01(String municipalityName) {
   return area_01;
 }
 
-//float getPopYear(String island, String year) {
-//  // get row of islands
-  
-//}
 
 // TODO: Update this based on your own radius calculation to make sure that the mouse selection
 // routines work
