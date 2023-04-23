@@ -58,6 +58,7 @@ Chart filterChart;
 // Button Status after click 'Filter'
 boolean unclickFilterButtons = true;
 boolean checkFilterResult = false;
+boolean compareClicked = false;
 Button[] buttons = new Button[4];
 DropdownList[] dropdowns = new DropdownList[3];
 
@@ -215,7 +216,9 @@ void draw() {
 
   overviewUI(selectedYear);
 
-  createPlots(islandInput1, islandInput2);
+  if(compareClicked){
+    createPlots(islandInput1, islandInput2);
+    }
   
   islandImg = loadImage(imgPath);
   if (showIslandImg)
@@ -255,6 +258,7 @@ void State(ControlEvent event) { //<>//
 public void Compare(int theValue) {
   println("Compare button is clicked");
   // call functions to show compared results
+  compareClicked =true;
 
   chartColor1 = color(255,0,0);
   chartColor2 = color(0,0,255);
@@ -270,6 +274,7 @@ public void Clear(int theValue) {
 
   chartColor1 = color(255);
   chartColor2 = color(255);
+  compareClicked=false;
   //inputDropdown1.clear();
   //inputDropdown2.clear();
 }
