@@ -19,6 +19,7 @@ float minPop1994, maxPop1994;
 float minPop2000, maxPop2000;
 float minPop2010, maxPop2010;
 float minArea, maxArea;
+String selectedYear = "";
 
 // Graphics and UI variables
 PanZoomMap panZoomMap;
@@ -126,22 +127,22 @@ void setup() {
     .setSize(120, 25)
     .activateBy(ControlP5.PRESSED);
 
-  controlP5.addButton("1980")
+  controlP5.addButton("Year1980")
     .setValue(0)
     .setPosition(310, 50)
     .setSize(60, 25);
 
-  controlP5.addButton("1994")
+  controlP5.addButton("Year1994")
     .setValue(0)
     .setPosition(380, 50)
     .setSize(60, 25);
   
-  controlP5.addButton("2000")
+  controlP5.addButton("Year2000")
     .setValue(0)
     .setPosition(450, 50)
     .setSize(60, 25);
   
-  controlP5.addButton("2010")
+  controlP5.addButton("Year2010")
     .setValue(0)
     .setPosition(520, 50)
     .setSize(60, 25);
@@ -202,28 +203,6 @@ void setup() {
      .setCaptionLabel("Select a state");
 
   
-  float h = max(max(maxPop1980, maxPop2000, maxPop2010), maxPop1994);
-  float m = min(min(minPop1980, minPop2000, minPop2010), minPop1994);
-  compareChart = controlP5.addChart("popChart")
-               .setPosition(1040, 110)
-               .setSize(300, 200)
-               .setRange(m-10, h+10)
-               .setView(Chart.BAR) // use Chart.LINE, Chart.PIE, Chart.AREA, Chart.BAR_CENTERED
-               ;
-  
-  compareChart.getColor().setBackground(color(0, 50));
-  compareChart.hide();
-
-  filterChart = controlP5.addChart("popfilterChart")
-               .setPosition(1540, 110)
-               .setSize(300, 200)
-               .setRange(m, h)
-               .setView(Chart.BAR) // use Chart.LINE, Chart.PIE, Chart.AREA, Chart.BAR_CENTERED
-               ;
-  
-  filterChart.getColor().setBackground(color(0, 50));
-  filterChart.hide(); 
-
 }
 
 void draw() {
@@ -234,19 +213,15 @@ void draw() {
   img.resize(1400, 800);
   background(img);
 
-  overviewUI("Population 2010 Census");
+  overviewUI(selectedYear);
 
   createPlots(islandInput1, islandInput2);
-  
-  
   
   islandImg = loadImage(imgPath);
   if (showIslandImg)
     image(islandImg, imgX, imgY, 330, 100);
    
 }
-
-
 
 
 void island1(ControlEvent event) {
@@ -269,12 +244,14 @@ void island2(ControlEvent event) {
 // get the state selected
 void State(ControlEvent event) { //<>//
   String[] states = {"YAP", "CHU", "KOS", "POH"};
+  
   if (event.isFrom("State")) {
-    println("Selected State: " + states[(int)event.getController().getValue()]);
+    selectedState = states[(int)event.getController().getValue()];
+    println("Selected State: " + selectedState);
   }
 }
 
-
+// event handler when clicking compare button
 public void Compare(int theValue) {
   println("Compare button is clicked");
   // call functions to show compared results
@@ -283,6 +260,7 @@ public void Compare(int theValue) {
   chartColor2 = color(0,0,255);
 }
 
+// event handler when clicking clear button
 public void Clear(int theValue) {
   println("clear button is clicked");
   compareChart.hide(); // hide the compare res chart
@@ -295,6 +273,35 @@ public void Clear(int theValue) {
   //inputDropdown1.clear();
   //inputDropdown2.clear();
 }
+
+// event handler when clicking 1980 button
+public void Year1980(int theValue) {
+  println("1980 button is clicked");
+  // call functions to show compared results
+  selectedYear = "Population 1980 Census";
+}
+
+// event handler when clicking 1980 button
+public void Year1994(int theValue) {
+  println("1994 button is clicked");
+  // call functions to show compared results
+  selectedYear = "Population 1994 Census";
+}
+
+// event handler when clicking 1980 button
+public void Year2000(int theValue) {
+  println("2000 button is clicked");
+  // call functions to show compared results
+  selectedYear = "Population 2000 Census";
+}
+
+// event handler when clicking 1980 button
+public void Year2010(int theValue) {
+  println("2010 button is clicked");
+  // call functions to show compared results
+  selectedYear = "Population 2010 Census";
+}
+
 
 // comparison results of two islands - user inputs after clicking compare button
 void showCompareRes(String island1, String island2) {
@@ -333,7 +340,6 @@ public void micronesianOverview(int theValue) {
 }
 
 
-
 void showMap(String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius) {
   // Municipalities should highlight (i.e., change appearance in some way) whenever the mouse is hovering
   // over them so the user knows something will happen if they click.  If they do click while a municipality
@@ -350,6 +356,7 @@ void showMap(String popYear, float minPopYear, float maxPopYear, color lowestPop
   float mapX2 = panZoomMap.longitudeToScreenX(163.1);
   float mapY2 = panZoomMap.latitudeToScreenY(10.0);
   rect(mapX1, mapY1, mapX2, mapY2);
+  
   for (int i=0; i<locationTable.getRowCount(); i++) {
     TableRow rowData = locationTable.getRow(i);
     String municipalityName = rowData.getString("Municipality");
@@ -363,13 +370,14 @@ void showMap(String popYear, float minPopYear, float maxPopYear, color lowestPop
     // municipality in the population table
     TableRow popRow = populationTable.findRow(municipalityName, "Municipality");
     int popuYear = popRow.getInt(popYear);
-
+    println(popuYear);
     int area = popRow.getInt("Area");
 
     // normalize data values to a 0..1 range
     float popuYear_01;
 
-    popuYear_01 = (popuYear - maxPopYear) / (maxPopYear - minPopYear);
+    popuYear_01 = (popuYear - minPopYear) / (maxPopYear - minPopYear);
+    println("popuyear_01 is"+popuYear_01);
     float area_01 = (area - minArea) / (maxArea - minArea);
 
     // two examples using lerp*() to map the data values to changes in visual attributes
@@ -411,21 +419,30 @@ void overviewUI(String popYear) {
 
   color lowestPopulationColor = color(255, 224, 121);
   color highestPopulationColor = color(232, 81, 21);
+  
   float maxPopYear;
   float minPopYear;
 
   if (popYear == "Population 2010 Census") {
     maxPopYear = maxPop2010;
     minPopYear = minPop2010;
+    lowestPopulationColor = color(255, 224, 121);
+    highestPopulationColor = color(232, 81, 21);
   } else if (popYear == "Population 2000 Census") {
     maxPopYear = maxPop2000;
     minPopYear = minPop2000;
+    lowestPopulationColor = color(0, 255, 0); // rgb
+    highestPopulationColor = color(255, 0, 255);
   } else if (popYear == "Population 1980 Census") {
     maxPopYear = maxPop1980;
     minPopYear = minPop1980;
+    lowestPopulationColor = color(255, 0, 0);
+    highestPopulationColor = color(0, 255, 255);
   } else { // 1994
     maxPopYear = maxPop1994;
     minPopYear = minPop1994;
+    lowestPopulationColor = color(0, 0, 255);
+    highestPopulationColor = color(255, 255, 0);
   }
 
   // show the map on the left side
@@ -436,8 +453,6 @@ void overviewUI(String popYear) {
   rect(1400, -10, 1010, 810); // (x, y width, height)
   line(1010, 600, 1400, 600); // (x1, y1, x2, y2)
 
-  //showFilteredRes("", "", 1994, "asceding");
-  
   showRes();
   
   // show the right side
