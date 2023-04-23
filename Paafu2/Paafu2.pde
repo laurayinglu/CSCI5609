@@ -64,8 +64,6 @@ String selectedmuniOption = "Romanum";
 String selectedyearOption = "1980";
 String selectedorderOption = "Ascending";
 
-String[] items = {"YAP", "CHU", "KOS", "POH"};
-
 String[] muniNames; 
 ArrayList<Float>[] yearData; 
 
@@ -82,6 +80,8 @@ float imgY = 0;
 PImage islandImg;
 String imgPath = "micro.jpeg";
 boolean showIslandImg = false;
+
+boolean compareClicked = false;
 
 // === PROCESSING BUILT-IN FUNCTIONS ===
 
@@ -126,25 +126,10 @@ void setup() {
     .setSize(120, 25)
     .activateBy(ControlP5.PRESSED);
 
-  controlP5.addButton("1980")
+  controlP5.addButton("Filter")
     .setValue(0)
-    .setPosition(310, 50)
-    .setSize(60, 25);
-
-  controlP5.addButton("1994")
-    .setValue(0)
-    .setPosition(380, 50)
-    .setSize(60, 25);
-  
-  controlP5.addButton("2000")
-    .setValue(0)
-    .setPosition(450, 50)
-    .setSize(60, 25);
-  
-  controlP5.addButton("2010")
-    .setValue(0)
-    .setPosition(520, 50)
-    .setSize(60, 25);
+    .setPosition(290, 50)
+    .setSize(120, 25);
 
   // set the table for selected municipality
   infoText = controlP5.addTextarea("txt")
@@ -193,14 +178,17 @@ void setup() {
     .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
   ;
 
-  controlP5.addDropdownList("State")
-     .setPosition(180, 50)
-     .setSize(120, 190)
-     .setBarHeight(30)
-     .setItemHeight(25)
-     .addItems(items)
-     .setCaptionLabel("Select a state");
-
+  stateDropdown = controlP5.addDropdownList("State")
+   .setPosition(180, 50)
+   .setSize(100, 20)
+   .setBarHeight(30)
+   .setItemHeight(20)
+  ;
+                  
+  stateDropdown.addItem("YAP", 0);
+  stateDropdown.addItem("CHU", 1);
+  stateDropdown.addItem("KOS", 2);
+  stateDropdown.addItem("POH", 3);
   
   float h = max(max(maxPop1980, maxPop2000, maxPop2010), maxPop1994);
   float m = min(min(minPop1980, minPop2000, minPop2010), minPop1994);
@@ -226,6 +214,7 @@ void setup() {
 
 }
 
+
 void draw() {
   // clear the screen
   background(230);
@@ -235,10 +224,15 @@ void draw() {
   background(img);
 
   overviewUI("Population 2010 Census");
+  
+  filterclicked();
 
-  createPlots(islandInput1, islandInput2);
+  if(compareClicked){
+      createPlots(islandInput1, islandInput2);
+  }
+
   
-  
+  showFilterGraphMuniDraw();
   
   islandImg = loadImage(imgPath);
   if (showIslandImg)
@@ -247,7 +241,155 @@ void draw() {
 }
 
 
+void filterclicked() {
+  String[] years = {"1980", "1994", "2000", "2010"};
+  String[] orders = {"Ascending", "Descending"};
+  String[] munData = getColumnData(populationTable, "Municipality");
 
+  if (unclickFilterButtons) {
+    if (buttons[0] == null) {
+      buttons[0] = controlP5.addButton("FilterBy")
+        .setPosition(290 + 0 * 120, 80)
+        .setSize(100, 30);
+    }
+
+    if (buttons[1] == null) {
+      buttons[1] = controlP5.addButton("Area")
+        .setPosition(290 + 3 * 120, 80)
+        .setSize(100, 30);
+    }
+    
+    if (buttons[2] == null) {
+      buttons[2] = controlP5.addButton("Apply")
+        .setPosition(290 + 5 * 120, 80)
+        .setSize(100, 30);
+    }
+
+    if(buttons[3] == null){
+      buttons[3] = controlP5.addButton("Reset")
+        .setPosition(290 + 5 * 120, 80+40)
+        .setSize(100, 30);
+    }
+
+    if (dropdowns[0] == null) {
+      dropdowns[0] = controlP5.addDropdownList("Municipality")
+        .setPosition(290 + 1 * 120, 80)
+        .setSize(100, 100)
+        .setBarHeight(30)
+        .setItemHeight(20);
+
+      for (int k = 0; k < munData.length; k++) {
+        dropdowns[0].addItem(munData[k], k);
+      }
+    }
+
+    if (dropdowns[1] == null) {
+      dropdowns[1] = controlP5.addDropdownList("Year")
+        .setPosition(290 + 2 * 120, 80)
+        .setSize(100, 100)
+        .setBarHeight(30)
+        .setItemHeight(20);
+
+      for (int i = 0; i < years.length; i++) {
+        dropdowns[1].addItem(years[i], i);
+      }
+    }
+
+
+    if (dropdowns[2] == null) {
+      dropdowns[2] = controlP5.addDropdownList("SortOrder")
+        .setPosition(290 + 4 * 120, 80)
+        .setSize(100, 100)
+        .setBarHeight(30)
+        .setItemHeight(20);
+
+      for (int j = 0; j < orders.length; j++) {
+        dropdowns[2].addItem(orders[j], j);
+      }
+    }
+  } else {
+    if (buttons[0] != null) {
+      controlP5.remove("FilterBy");
+      buttons[0] = null;
+    }
+
+    if (buttons[1] != null) {
+      controlP5.remove("Area");
+      buttons[1] = null;
+    }
+    
+    if (buttons[2] != null) {
+      controlP5.remove("Apply");
+      buttons[2] = null;
+    }
+
+    if (buttons[3] != null) {
+      controlP5.remove("Reset");
+      buttons[3] = null;
+    }
+
+    if (dropdowns[0] != null) {
+      controlP5.remove("Municipality");
+      dropdowns[0] = null;
+    }
+
+    if (dropdowns[1] != null) {
+      controlP5.remove("Year");
+      dropdowns[1] = null;
+    }
+
+    if (dropdowns[2] != null) {
+      controlP5.remove("SortOrder");
+      dropdowns[2] = null;
+    }
+  }
+}
+
+void Filter() {
+  unclickFilterButtons = !unclickFilterButtons;
+}
+
+void Year(ControlEvent event) {
+  String[] years = {"1980", "1994", "2000", "2010"};
+  if (event.isFrom("Year")) {
+    selectedyearOption = years[(int)event.getController().getValue()];
+    println("Selected Year: " + years[(int)event.getController().getValue()]);
+  }
+}
+
+void Municipality(ControlEvent event) {
+  String[] munData = getColumnData(populationTable, "Municipality");
+  if (event.isFrom("Municipality")) {
+    selectedmuniOption = munData[(int)event.getController().getValue()];
+    println("Selected Municipality: " + munData[(int)event.getController().getValue()]);
+  }
+}
+
+void SortOrder(ControlEvent event) {
+  String[] orders = {"Ascending", "Descending"};
+  if (event.isFrom("SortOrder")) {
+    selectedorderOption = orders[(int)event.getController().getValue()];
+    println("Selected Sort Order: " + orders[(int)event.getController().getValue()]);
+  }
+}
+
+void Area(ControlEvent event) {
+  if (event.isFrom("Area")) {
+    println("Area is clicked.");
+  }
+}
+
+void Apply(ControlEvent event) {
+  if (event.isFrom("Apply")) {
+    println("Apply is clicked.");
+  }
+}
+
+void Reset(ControlEvent event) {
+  if (event.isFrom("Reset")) {
+    println("Reset is clicked.");
+  }
+}
 
 void island1(ControlEvent event) {
   String[] munData = getColumnData(populationTable, "Municipality");
@@ -276,8 +418,10 @@ void State(ControlEvent event) { //<>//
 
 
 public void Compare(int theValue) {
+  
   println("Compare button is clicked");
   // call functions to show compared results
+  compareClicked = true;
 
   chartColor1 = color(255,0,0);
   chartColor2 = color(0,0,255);
@@ -292,6 +436,8 @@ public void Clear(int theValue) {
 
   chartColor1 = color(255);
   chartColor2 = color(255);
+
+  compareClicked= false;
   //inputDropdown1.clear();
   //inputDropdown2.clear();
 }
@@ -332,7 +478,9 @@ public void micronesianOverview(int theValue) {
   println("a button event from micronesianOverview: "+ theValue); // 0
 }
 
-
+void FilterOverview(int theValue) {
+  println("a button event from Filter: "+ theValue); // 0
+}
 
 void showMap(String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius) {
   // Municipalities should highlight (i.e., change appearance in some way) whenever the mouse is hovering
@@ -456,6 +604,12 @@ void showRes() {
 }
 
 
+// filtered results
+void showFilteredRes(String popYear, String muni, int year, String sortRule) {
+  // Year + Sort order - Show the selected year census trend plot (1 year, all places)
+  // Muni + Sort order - Show the Municipality population trend plot (1 place, 4 years)
+  // Area + Sort order - Recent result sorting by area
+}
 
 void showLengends(String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius) {
 
@@ -786,6 +940,69 @@ void createPlots(String i1, String i2) {//float[] pops, float max, float min) {
 
   // show trends of population
   
+}
+
+void showFilterGraphMuni(String island, ArrayList<Float> yearData, ArrayList<String> yearLabels, boolean ascending, float scale) {
+  ArrayList<Float> sortedData = new ArrayList<Float>(yearData);
+  if (ascending) {
+    Collections.sort(sortedData);
+  } else {
+    Collections.sort(sortedData, Collections.reverseOrder());
+  }
+  
+  float scaleWidth = (width - 100) * scale;
+  float scaleHeight = (20 + 10) * yearData.size() * scale;
+
+  fill(0);
+  text(island,1060,368);
+  float x = 1080;
+  float y = 380;
+  float barHeight = 15 * scale;
+  float barSpacing = 10 * scale;
+  float maxValue = sortedData.get(sortedData.size() - 1);
+  for (int i = 0; i < sortedData.size(); i++) {
+    float value = sortedData.get(i);
+    int index = yearData.indexOf(value);
+    String year = yearLabels.get(index);
+    float barWidth = map(value, 0, maxValue, 0, scaleWidth) * 0.1;
+    fill(255,192,203);
+    rect(x, y, barWidth, barHeight);
+    fill(0);
+    textAlign(RIGHT, CENTER);
+    text(year + " (" + nf(value, 0, 2) + ")", x - 5, y + barHeight / 2);
+    y += barHeight + barSpacing;
+  }
+}
+
+void showFilterGraphMuniDraw(){
+  muniNames = getColumnData(populationTable, "Municipality", String.class).toArray(new String[0]);
+  yearData = new ArrayList[muniNames.length];
+  for (int i = 0; i < muniNames.length; i++) {
+    ArrayList<Float> yearDataList = new ArrayList<Float>();
+    yearDataList.add(populationTable.getFloat(i, 2));
+    yearDataList.add(populationTable.getFloat(i, 3));
+    yearDataList.add(populationTable.getFloat(i, 4));
+    yearDataList.add(populationTable.getFloat(i, 5));
+    yearData[i] = yearDataList;
+  }
+
+
+
+  String selectedIsland = selectedmuniOption;
+  int index = Arrays.asList(muniNames).indexOf(selectedIsland);
+  ArrayList<Float> selectedYearData = new ArrayList<Float>();
+
+  ArrayList<String> yearLabels = new ArrayList<String>();
+  selectedYearData.add(populationTable.getFloat(index, 2));
+  yearLabels.add("1980");
+  selectedYearData.add(populationTable.getFloat(index, 3));
+  yearLabels.add("1994");
+  selectedYearData.add(populationTable.getFloat(index, 4));
+  yearLabels.add("2000");
+  selectedYearData.add(populationTable.getFloat(index, 5));
+  yearLabels.add("2010");
+  
+  showFilterGraphMuni(selectedIsland, selectedYearData, yearLabels, false, 0.5);
 }
 
 
