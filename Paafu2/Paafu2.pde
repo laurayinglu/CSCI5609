@@ -41,8 +41,9 @@ String highlightedMunicipality = "";
 String selectedMunicipality = "Romanum";
 String islandInput1 = "";
 String islandInput2 = "";
-String popIslandInput1 = "";
-String popIslandInput2 = "";
+String yearInput1 = "";
+String yearInput2 = "";
+boolean compareYearBtn = false;
 
 String selectedState = "all";
 
@@ -246,36 +247,37 @@ void setup() {
     .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
   ;
 
-  popInputDropdown1 = controlP5.addDropdownList("pop1")
+  popInputDropdown1 = controlP5.addDropdownList("year1")
     .setPosition(1020, 390)
     .setSize(120, 250)
-    // .setBarHeight(30)
-    .setItemHeight(25)
+    .setBarHeight(30)
+    .setItemHeight(20)
     .addItems(censusYears)
-    .setCaptionLabel("Select a census year").close();
-
+    .setCaptionLabel("Select a census year").close()
   ;
 
-  popInputDropdown2 = controlP5.addDropdownList("pop2")
+  popInputDropdown2 = controlP5.addDropdownList("year2")
    .setPosition(1150, 390)
    .setSize(120, 250)
-  //  .setBarHeight(30)
-   .setItemHeight(25)
+   .setBarHeight(30)
+   .setItemHeight(20)
    .addItems(censusYears)
-   .setCaptionLabel("Select a census year").close();
+   .setCaptionLabel("Select a census year").close()
+  ;
+
+  controlP5.addButton("CompareYear")
+    .setPosition(1280, 390)
+    .setSize(80, 15)
+    .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
+    // .setCaptionLabel("Compare Year")
   ;
   
-  // for (int i=0; i<locationTable.getRowCount(); i++) {
-  //     // TableRow rowData = locationTable.getRow(i);
-  //     // String municipalityName = rowData.getString("Municipality");
-  //     // println(municipalityName);
-
-  //     popInputDropdown1.addItem(municipalityName, i);
-  //     popInputDropdown2.addItem(municipalityName, i);
-  // }
-
-
-
+  controlP5.addButton("ClearYear")
+    .setPosition(1280, 410)
+    .setSize(80, 15)
+    .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
+    // .setCaptionLabel("Reset")
+  ;
   
 }
 
@@ -283,7 +285,7 @@ void draw() {
   // clear the screen
   background(230);
   PImage img;
-  img = loadImage("micro.jpeg"); //<>// //<>// //<>//
+  img = loadImage("micro.jpeg"); 
   img.resize(1400, 800);
   background(img);
 
@@ -291,27 +293,25 @@ void draw() {
 
   if(compareClicked){
     createPlots(islandInput1, islandInput2);
-   }
+  }
   
   islandImg = loadImage(imgPath);
   if (showIslandImg)
     image(islandImg, imgX, imgY, 330, 100);
-   
+
 }
-void pop1(ControlEvent event) { //<>// //<>// //<>// //<>// //<>//
-  // String[] states = {"YAP", "CHU", "KOS", "POH"};
-  
-  if (event.isFrom("pop1")) {
-    popIslandInput1 = censusYears[(int)event.getController().getValue()];
-    println("popIslandInput1: " + popIslandInput1);
+
+void year1(ControlEvent event) { 
+  if (event.isFrom("year1")) {
+    yearInput1 = censusYears[(int)event.getController().getValue()];
+    println("yearInput1: " + yearInput1);
   }
 }
-void pop2(ControlEvent event) { //<>// //<>// //<>// //<>// //<>//
-  // String[] states = {"YAP", "CHU", "KOS", "POH"};
-  
-  if (event.isFrom("pop2")) {
-    popIslandInput2 = censusYears[(int)event.getController().getValue()];
-    println("popIslandInput2: " + popIslandInput2);
+
+void year2(ControlEvent event) {
+  if (event.isFrom("year2")) {
+    yearInput2 = censusYears[(int)event.getController().getValue()];
+    println("yearInput2: " + yearInput2);
   }
 }
 
@@ -334,7 +334,7 @@ void island2(ControlEvent event) {
 }
 
 // get the state selected
-void State(ControlEvent event) { //<>// //<>// //<>// //<>// //<>//
+void State(ControlEvent event) { 
   String[] states = {"YAP", "CHU", "KOS", "POH"};
   
   if (event.isFrom("State")) {
@@ -360,12 +360,23 @@ public void Clear(int theValue) {
   islandInput1 = "";
   islandInput2 = "";
 
-
   chartColor1 = color(255);
   chartColor2 = color(255);
   compareClicked=false;
   //inputDropdown1.clear();
   //inputDropdown2.clear();
+}
+
+// event handler when clicking compare button
+public void CompareYear(int theValue) {
+  compareYearBtn = true;
+}
+
+// event handler when clicking clear button
+public void ClearYear(int theValue) {
+  yearInput1 = "";
+  yearInput2 = "";
+  compareYearBtn = false;
 }
 
 public void ClearState(int theValue) {
@@ -409,7 +420,6 @@ public void resetShowPop(int theValue) {
   showPopDen = false;
 }
 
-
 // comparison results of two islands - user inputs after clicking compare button
 void showCompareRes(String island1, String island2) {
   //text("Compared results:", 1020, 100);
@@ -419,7 +429,6 @@ void showCompareRes(String island1, String island2) {
   compareChart.setData("world", new float[4]);
   compareChart.setStrokeWeight(1.5);
 }
-
 
 // for customize the dropdown menu
 void customizeDropdown(DropdownList ddl, String name) {
@@ -485,14 +494,25 @@ void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear
     float screenX = panZoomMap.longitudeToScreenX(longitude);
     float screenY = panZoomMap.latitudeToScreenY(latitude);
 
-    // lat,long code above is the same as part A.  if we also get the municipality name
-    // for this row in the location table, then we can look up population data for the
-    // municipality in the population table
     TableRow popRow = populationTable.findRow(municipalityName, "Municipality");
     int popuYear = popRow.getInt(popYear);
     int area = popRow.getInt("Area");
     float popuYearDen = popuYear/area;
+    float popRate = 0;
+    float fy = 0;
+    float sy = 0;
+    if (compareYearBtn) {
+      fy = popRow.getInt(yearInput1);
+      sy = popRow.getInt(yearInput2);
+      println(yearInput1);
+      if (fy == 0) {
+        fy = 1;
+      }
+      if (sy == 0)
+        sy = 1;
 
+      popRate = (fy -  sy) / fy;
+    }
     // normalize data values to a 0..1 range
     float popuYear_01;
     //println("showden is", showDen);
@@ -500,6 +520,9 @@ void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear
     if (showDen) {
       // it's representing the population density = pop/area
       popuYear_01 = (popuYearDen - minPopYearDen) / (maxPopYearDen - minPopYearDen);
+    } else if (compareYearBtn) {
+      popuYear_01 = popRate;
+
     } else {
       popuYear_01 = (popuYear - minPopYear) / (maxPopYear - minPopYear);
     }
@@ -512,8 +535,19 @@ void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear
     float radius = lerp(minRadius, maxRadius, area_01);
 
     // 2. adjust the fill color in proportion to the population
-    color c = lerpColorLab(lowestPopulationColor, highestPopulationColor, popuYear_01);
-    fill(c);
+    if (compareYearBtn) {
+      if (popRate<0){
+        color c = lerpColor(color(255,0,0),color(0,255,0),(-popRate+0.5));
+        fill(c);
+      }else{
+        color c = lerpColor(color(255,0,0),color(0,255,0),(popRate));
+        fill(c);
+      }
+    } else {
+      color c = lerpColorLab(lowestPopulationColor, highestPopulationColor, popuYear_01);
+      fill(c);
+    }
+
 
     noStroke();
     ellipseMode(RADIUS);
@@ -690,7 +724,7 @@ void showDenLegend() {
       maxDen = maxPopYear2010Den;
       minDen = minPopYear2010Den;
     }
-    println("max and min are", maxNumDots, minNumDots);
+    // println("max and min are", maxNumDots, minNumDots);
     int radius = 20;
     int startX = 1060;
     int startY = 580;
@@ -736,24 +770,46 @@ void showAreaLegend(float minRadius, float maxRadius) {
 void showPopLegend(String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor) {
 
   // colormap legend
-
-  text(popYear, 1050, 635);
-  textAlign(CENTER, CENTER);
-  strokeWeight(1);
-  //textAlign(RIGHT, CENTER);
-  int gradientHeight = 20;
-  int gradientWidth = 220;
-  int labelStep = gradientWidth / 5;
-  for (int x=0; x<gradientWidth; x++) {
-    float amt = 1.0 - (float)x/(gradientWidth-1);
-    color c = lerpColorLab(lowestPopulationColor, highestPopulationColor, amt);
-    stroke(c);
-    line(1050 + x, 650, 1050 + x, 650+gradientHeight);
-    if ((x % labelStep == 0) || (x == gradientWidth-1)) {
-      int labelValue = (int)(minPopYear + amt*(maxPopYear - minPopYear));
-      text(labelValue, 1050 + x, 680);
-    }
+  if (compareYearBtn) {
+    text("Pop growth rate between year " + yearInput1 + " and " + yearInput2, 1020, 635); 
+    maxPopYear = 100;
+    minPopYear = 0;
   }
+  else {
+    text(popYear, 1050, 635);
+  }
+    textAlign(CENTER, CENTER);
+    strokeWeight(1);
+    //textAlign(RIGHT, CENTER);
+    int gradientHeight = 20;
+    int gradientWidth = 220;
+    int labelStep = gradientWidth / 5;
+    for (int x=0; x<gradientWidth; x++) {
+      float amt = 1.0 - (float)x/(gradientWidth-1);
+      if (!compareYearBtn) {
+        color c = lerpColorLab(lowestPopulationColor, highestPopulationColor, amt);
+        stroke(c);
+      }
+      else  {
+        color c = lerpColor(color(255,0,0),color(0,255,0),amt);
+        stroke(c);
+      }
+
+      line(1050 + x, 650, 1050 + x, 650+gradientHeight);
+      if ((x % labelStep == 0) || (x == gradientWidth-1)) {
+        int labelValue = (int)(minPopYear + amt*(maxPopYear - minPopYear));
+        if (!compareYearBtn)
+          text(labelValue, 1050 + x, 680);
+        // else 
+        //   text(100-x, 1050 + x, 680);
+      }
+    }
+
+    if (compareYearBtn){
+      text("Largest growth rate", 1060, 680);
+      text("Smallest growth rate", 1050 + 220, 680);
+    }
+  
 }
 
 void keyPressed() {
