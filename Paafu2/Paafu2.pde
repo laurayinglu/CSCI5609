@@ -41,6 +41,8 @@ String highlightedMunicipality = "";
 String selectedMunicipality = "Romanum";
 String islandInput1 = "";
 String islandInput2 = "";
+String popIslandInput1 = "";
+String popIslandInput2 = "";
 
 String selectedState = "all";
 
@@ -64,7 +66,8 @@ DropdownList filter;
 
 DropdownList inputDropdown1;
 DropdownList inputDropdown2;
-
+DropdownList popInputDropdown1;
+DropdownList popInputDropdown2;
 Chart compareChart;
 Chart filterChart;
 
@@ -82,6 +85,7 @@ String selectedyearOption = "1980";
 String selectedorderOption = "Ascending";
 
 String[] items = {"YAP", "CHU", "KOS", "POH"};
+String[] censusYears ={"Population 1980 Census","Population 1994 Census","Population 2000 Census","Population 2010 Census"};
 
 String[] muniNames; 
 ArrayList<Float>[] yearData; 
@@ -184,7 +188,7 @@ void setup() {
      .setBarHeight(25)
      .setItemHeight(25)
      .addItems(items)
-     .setCaptionLabel("Select a state");
+     .setCaptionLabel("Select a state").close();
      
      
  controlP5.addButton("ClearState")
@@ -210,14 +214,15 @@ void setup() {
     .setPosition(1020, 55)
     .setSize(120, 200)
     .setBarHeight(30)
-    .setItemHeight(25)
+    .setItemHeight(25).close()
+    
   ;
 
   inputDropdown2 = controlP5.addDropdownList("island2")
    .setPosition(1150, 55)
    .setSize(120, 200)
    .setBarHeight(30)
-   .setItemHeight(25)
+   .setItemHeight(25).close()
   ;
   
   for (int i=0; i<locationTable.getRowCount(); i++) {
@@ -240,6 +245,34 @@ void setup() {
     .setSize(80, 15)
     .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
   ;
+
+  popInputDropdown1 = controlP5.addDropdownList("pop1")
+    .setPosition(1020, 390)
+    .setSize(120, 250)
+    // .setBarHeight(30)
+    .setItemHeight(25)
+    .addItems(censusYears)
+    .setCaptionLabel("Select a census year").close();
+
+  ;
+
+  popInputDropdown2 = controlP5.addDropdownList("pop2")
+   .setPosition(1150, 390)
+   .setSize(120, 250)
+  //  .setBarHeight(30)
+   .setItemHeight(25)
+   .addItems(censusYears)
+   .setCaptionLabel("Select a census year").close();
+  ;
+  
+  // for (int i=0; i<locationTable.getRowCount(); i++) {
+  //     // TableRow rowData = locationTable.getRow(i);
+  //     // String municipalityName = rowData.getString("Municipality");
+  //     // println(municipalityName);
+
+  //     popInputDropdown1.addItem(municipalityName, i);
+  //     popInputDropdown2.addItem(municipalityName, i);
+  // }
 
 
 
@@ -264,6 +297,22 @@ void draw() {
   if (showIslandImg)
     image(islandImg, imgX, imgY, 330, 100);
    
+}
+void pop1(ControlEvent event) { //<>// //<>// //<>// //<>// //<>//
+  // String[] states = {"YAP", "CHU", "KOS", "POH"};
+  
+  if (event.isFrom("pop1")) {
+    popIslandInput1 = censusYears[(int)event.getController().getValue()];
+    println("popIslandInput1: " + popIslandInput1);
+  }
+}
+void pop2(ControlEvent event) { //<>// //<>// //<>// //<>// //<>//
+  // String[] states = {"YAP", "CHU", "KOS", "POH"};
+  
+  if (event.isFrom("pop2")) {
+    popIslandInput2 = censusYears[(int)event.getController().getValue()];
+    println("popIslandInput2: " + popIslandInput2);
+  }
 }
 
 
