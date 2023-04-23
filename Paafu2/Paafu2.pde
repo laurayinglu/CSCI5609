@@ -11,6 +11,7 @@ PaafuDirections paafuDirections;
 // Derived data: kinships based on Paafu directions
 KinshipTies kinshipTies;
 
+
 // Derived data: mins and maxes for each data variable
 float minLatitude, maxLatitude;
 float minLongitude, maxLongitude;
@@ -19,6 +20,16 @@ float minPop1994, maxPop1994;
 float minPop2000, maxPop2000;
 float minPop2010, maxPop2010;
 float minArea, maxArea;
+
+float minPopYear1980Den = 10000;
+float minPopYear1994Den = 10000;
+float minPopYear2000Den = 10000;
+float minPopYear2010Den = 10000;
+float maxPopYear1980Den = 0.0;
+float maxPopYear1994Den = 0.0;
+float maxPopYear2000Den = 0.0;
+float maxPopYear2010Den = 0.0;
+
 String selectedYear = "";
 boolean showPopDen = false;
 
@@ -902,6 +913,38 @@ void computeDerivedData() {
 
 // find min and max population density of 4 years
 void computePopDensityData() {
+  for(int i = 0;i<populationTable.getRowCount();i++){
+    TableRow rowData = locationTable.getRow(i);
+    float den1980 = rowData.getFloat("Population 1980 Census")/rowData.getFloat("Area");
+    if (den1980<minPopYear1980Den){
+      minPopYear1980Den = den1980;
+    }else if (den1980>maxPopYear1980Den) {
+      maxPopYear1980Den = den1980;
+    }
+    float den1994 = rowData.getFloat("Population 1994 Census")/rowData.getFloat("Area");
+    if (den1994<minPopYear1994Den){
+      minPopYear1994Den = den1994;
+    }else if (den1994>maxPopYear1994Den) {
+      maxPopYear1994Den = den1994;
+    }
+    float den2000 = rowData.getFloat("Population 2000 Census")/rowData.getFloat("Area");
+    if (den2000<minPopYear2000Den){
+      minPopYear2000Den = den2000;
+    }else if (den2000>maxPopYear2000Den) {
+      maxPopYear2000Den = den2000;
+    }
+    float den2010 = rowData.getFloat("Population 2010 Census")/rowData.getFloat("Area");
+    if (den2010<minPopYear2010Den){
+      minPopYear2010Den = den2010;
+    }else if (den2010>maxPopYear2010Den) {
+      maxPopYear2010Den = den2010;
+    }
+  }
+  println(minPopYear1980Den, maxPopYear1980Den,
+   minPopYear1994Den, maxPopYear1994Den,
+   minPopYear2000Den, maxPopYear2000Den,
+   minPopYear2010Den, maxPopYear2010Den);
+
   
 }
 
