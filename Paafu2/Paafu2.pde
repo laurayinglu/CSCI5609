@@ -20,11 +20,6 @@ float minPop1994, maxPop1994;
 float minPop2000, maxPop2000;
 float minPop2010, maxPop2010;
 
-float minPop1980Den, maxPop1980Den;
-float minPop1994Den, maxPop1994Den;
-float minPop2000Den, maxPop2000Den;
-float minPop2010Den, maxPop2010Den;
-
 float minArea, maxArea;
 
 float minPopYear1980Den = 10000;
@@ -392,14 +387,11 @@ void customizeDropdown(DropdownList ddl, String name) {
   ddl.setColorActive(color(255, 128));
 }
 
-
-
 // function colorA will receive changes from
 // controller with name Micronesian Overview
 public void micronesianOverview(int theValue) {
   println("a button event from micronesianOverview: "+ theValue); // 0
 }
-
 
 void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear, 
             color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius,
@@ -452,7 +444,7 @@ void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear
 
     // normalize data values to a 0..1 range
     float popuYear_01;
-     println("showden is", showDen);
+    println("showden is", showDen);
     // encode population density with color
     if (showDen) {
       // it's representing the population density = pop/area
@@ -461,7 +453,6 @@ void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear
       popuYear_01 = (popuYear - minPopYear) / (maxPopYear - minPopYear);
     }
 
-    
     float area_01 = (area - minArea) / (maxArea - minArea);
 
     // two examples using lerp*() to map the data values to changes in visual attributes
@@ -479,31 +470,44 @@ void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear
     // highlight the circle if highlightedMunicipality == its name
     // also show detailed info of hovered municipality
     if (highlightedMunicipality == municipalityName) {
-      if(showDen) {
-        radius = 20;
-      }
+      // if(showDen) {
+      //   radius = 20;
+      // }
       fill(0, 0, 255);
       circle(screenX, screenY, radius);
+
+      if (showDen) {
+        // noFill();
+        strokeWeight(1);
+        // stroke(0);
+        for (int j = 0; j < int(popuYearDen); j++) {
+          float angle = random(TWO_PI);
+          float r = sqrt(random(1)) * radius;
+          float x = screenX + r * cos(angle);
+          float y = screenY + r * sin(angle);
+          point(x, y);
+        }
+      }
+
       textAlign(LEFT, CENTER);
       float xTextOffset = radius + 4; // move the text to the right of the circle
       text(municipalityName, screenX + xTextOffset, screenY);
     } else {
-      if(showDen) {
-        radius = 20;
-      }
       circle(screenX, screenY, radius);
-      noFill();
-      strokeWeight(1);
-      stroke(0);
-      for (int j = 0; j < 20; j++) {
-        float angle = random(TWO_PI);
-        float r = sqrt(random(1)) * radius;
-        float x = screenX + r * cos(angle);
-        float y = screenY + r * sin(angle);
-        point(x, y);
-      }
+      // if (showDen) {
+        noFill();
+        strokeWeight(2);
+        stroke(0,0,0);
+ //int(popuYear)
+        for (int j = 0; j < int(popuYear/500); j++) {
+          float angle = random(TWO_PI);
+          float r = sqrt(random(1)) * radius;
+          float x = screenX + r * cos(angle);
+          float y = screenY + r * sin(angle);
+          point(x, y);
+        }
+      // }
     
-      //noLoop();
   
       textAlign(LEFT, CENTER);
       float xTextOffset = radius + 4; // move the text to the right of the circle
@@ -532,29 +536,29 @@ void overviewUI(String popYear, boolean showDen) {
   if (popYear == "Population 2010 Census") {
     maxPopYear = maxPop2010;
     minPopYear = minPop2010;
-    maxPopYearDen = maxPop2010Den;
-    minPopYearDen = minPop2010Den;
+    maxPopYearDen = maxPopYear2010Den;
+    minPopYearDen = minPopYear2010Den;
     lowestPopulationColor = color(255, 224, 121);
     highestPopulationColor = color(232, 81, 21);
   } else if (popYear == "Population 2000 Census") {
     maxPopYear = maxPop2000;
     minPopYear = minPop2000;
-    maxPopYearDen = maxPop2000Den;
-    minPopYearDen = minPop2000Den;
+    maxPopYearDen = maxPopYear2000Den;
+    minPopYearDen = minPopYear2000Den;
     lowestPopulationColor = color(0, 255, 0); // rgb
     highestPopulationColor = color(255, 0, 255);
   } else if (popYear == "Population 1980 Census") {
     maxPopYear = maxPop1980;
     minPopYear = minPop1980;
-    maxPopYearDen = maxPop1980Den;
-    minPopYearDen = minPop1980Den;
+    maxPopYearDen = maxPopYear1980Den;
+    minPopYearDen = minPopYear1980Den;
     lowestPopulationColor = color(255, 0, 0);
     highestPopulationColor = color(0, 255, 255);
   } else { // 1994
     maxPopYear = maxPop1994;
     minPopYear = minPop1994;
-    maxPopYearDen = maxPop1994Den;
-    minPopYearDen = minPop1994Den;
+    maxPopYearDen = maxPopYear1994Den;
+    minPopYearDen = minPopYear1994Den;
     lowestPopulationColor = color(0, 0, 255);
     highestPopulationColor = color(255, 255, 0);
   }
@@ -986,13 +990,12 @@ void computePopDensityData() {
     }
   }
   println(minPopYear1980Den, maxPopYear1980Den,
-   minPopYear1994Den, maxPopYear1994Den,
-   minPopYear2000Den, maxPopYear2000Den,
-   minPopYear2010Den, maxPopYear2010Den);
+    minPopYear1994Den, maxPopYear1994Den,
+    minPopYear2000Den, maxPopYear2000Den,
+    minPopYear2010Den, maxPopYear2010Den);
 
   
 }
-
 
 
 // === NEW METHOD FOR USING ===
