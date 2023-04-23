@@ -1,4 +1,4 @@
-/* CSci-5609 Assignment 2: Visualization of Paafu Kinship Ties for the Islands of Micronesia //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+/* CSci-5609 Assignment 2: Visualization of Paafu Kinship Ties for the Islands of Micronesia //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
  */
 
 // === GLOBAL DATA VARIABLES ===
@@ -31,7 +31,7 @@ float maxPopYear1994Den = 0.0;
 float maxPopYear2000Den = 0.0;
 float maxPopYear2010Den = 0.0;
 
-String selectedYear = "";
+String selectedYear = "Population 1980 Census";
 boolean showPopDen = false;
 
 // Graphics and UI variables
@@ -163,17 +163,17 @@ void setup() {
     .setPosition(520, 50)
     .setSize(60, 25);
     
-  controlP5.addButton("ShowPopDensity")
-      .setValue(0)
-      .setPosition(310, 100)
-      .setSize(150, 25)
-      .setCaptionLabel("Show Population density");
+  // controlP5.addButton("ShowPopDensity")
+  //     .setValue(0)
+  //     .setPosition(310, 100)
+  //     .setSize(150, 25)
+  //     .setCaptionLabel("Show Population density");
       
-  controlP5.addButton("resetShowPop")
-      .setValue(0)
-      .setPosition(310, 130)
-      .setSize(150, 25)
-      .setCaptionLabel("Reset show Pop Density");
+  // controlP5.addButton("resetShowPop")
+  //     .setValue(0)
+  //     .setPosition(310, 130)
+  //     .setSize(150, 25)
+  //     .setCaptionLabel("Reset show Pop Density");
       
       
   controlP5.addDropdownList("State")
@@ -195,7 +195,7 @@ void setup() {
   // set the table for selected municipality
   infoText = controlP5.addTextarea("txt")
     .setPosition(0, 0)
-    .setSize(330, 170)
+    .setSize(330, 190)
     .setLineHeight(14)
     .disableColorBackground()
   ;
@@ -248,7 +248,7 @@ void draw() {
   // clear the screen
   background(230);
   PImage img;
-  img = loadImage("micro.jpeg"); //<>//
+  img = loadImage("micro.jpeg"); //<>// //<>// //<>//
   img.resize(1400, 800);
   background(img);
 
@@ -283,7 +283,7 @@ void island2(ControlEvent event) {
 }
 
 // get the state selected
-void State(ControlEvent event) { //<>//
+void State(ControlEvent event) { //<>// //<>// //<>// //<>// //<>//
   String[] states = {"YAP", "CHU", "KOS", "POH"};
   
   if (event.isFrom("State")) {
@@ -444,7 +444,7 @@ void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear
 
     // normalize data values to a 0..1 range
     float popuYear_01;
-    println("showden is", showDen);
+    //println("showden is", showDen);
     // encode population density with color
     if (showDen) {
       // it's representing the population density = pop/area
@@ -498,8 +498,8 @@ void showMap(boolean showDen, String popYear, float minPopYear, float maxPopYear
         noFill();
         strokeWeight(2);
         stroke(0,0,0);
- //int(popuYear)
-        for (int j = 0; j < int(popuYear/500); j++) {
+        //int(popuYear)
+        for (int j = 0; j < int(popuYearDen); j++) {
           float angle = random(TWO_PI);
           float r = sqrt(random(1)) * radius;
           float x = screenX + r * cos(angle);
@@ -569,12 +569,12 @@ void overviewUI(String popYear, boolean showDen) {
   fill(250);
   stroke(111, 87, 0);
   rect(1400, -10, 1010, 810); // (x, y width, height)
-  line(1010, 600, 1400, 600); // (x1, y1, x2, y2)
+  line(1010, 500, 1400, 500); // (x1, y1, x2, y2)
 
   showRes();
   
   // show the right side
-  showLengends(popYear, minPopYear, maxPopYear, lowestPopulationColor, highestPopulationColor, minRadius, maxRadius);
+  showLegends(popYear, minPopYear, maxPopYear, lowestPopulationColor, highestPopulationColor, minRadius, maxRadius);
 }
 
 void showRes() {
@@ -586,26 +586,42 @@ void showRes() {
   rectMode(CORNER);
   fill(167, 50);
   rect(1010, 0, 90, 22);
-}
-
-
-
-void showLengends(String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius) {
 
   fill(111, 87, 0);
+  textSize(13);
+  text("> Start by choosing two years to compare: \n", 1020, 380);
+}
+
+void showLegends(String popYear, float minPopYear, float maxPopYear, color lowestPopulationColor, color highestPopulationColor, float minRadius, float maxRadius) {
+  fill(111, 87, 0);
   textSize(12);
-  text("Lengends", 1020, 610);
+  text("Legends", 1020, 510);
   rectMode(CORNER);
   fill(167, 50);
-  rect(1010, 600, 70, 22);// , 28);
+  rect(1010, 500, 70, 22);// , 28);
 
   fill(111, 87, 0);
   textSize(10);
   showPopLegend(popYear, minPopYear, maxPopYear, lowestPopulationColor, highestPopulationColor);
-  showAreaLengend(minRadius, maxRadius);
+  showAreaLegend(minRadius, maxRadius);
 }
 
-void showAreaLengend(float minRadius, float maxRadius) {
+// show legends of population deensity of selected year
+void showDenLegend(String popYear) {
+    noFill();
+    strokeWeight(2);
+    stroke(0,0,0);
+    //int(popuYear)
+    //for (int j = 0; j < int(popuYearDen); j++) {
+    //  float angle = random(TWO_PI);
+    //  float r = sqrt(random(1)) * radius;
+    //  float x = screenX + r * cos(angle);
+    //  float y = screenY + r * sin(angle);
+    //  point(x, y);
+    //}
+}
+
+void showAreaLegend(float minRadius, float maxRadius) {
   // circle size legend
   textAlign(CENTER, CENTER);
   text("Municipality Area", 1090, 710);
@@ -649,7 +665,6 @@ void showPopLegend(String popYear, float minPopYear, float maxPopYear, color low
   }
 }
 
-
 void keyPressed() {
   if (key == ' ') {
     println("current scale: ", panZoomMap.scale, " current translation: ", panZoomMap.translateX, "x", panZoomMap.translateY);
@@ -674,7 +689,8 @@ void mousePressed() {
     float[] pops = getCensus(selectedMunicipality);
     String state = "State: " + getState(selectedMunicipality) + "\n";;
     String pops4 = "[1980, 1994, 2000, 2010] Census: [" + pops[0] + ", " + pops[1] + ", " + pops[2] + ", " + pops[3] + "] \n";
-    info = name + state + loc + pops4 + area;
+    String den = "population density of selected year " + selectedYear + " : " + getPopDensityData(selectedYear, selectedMunicipality) + "\n";
+    info = name + state + loc + pops4 + area + den;
     
     infoTableX = mouseX + 5;
     infoTableY = mouseY + 20;
@@ -684,12 +700,15 @@ void mousePressed() {
     infoText.setColorBackground(color(87, 100));
     infoText.setColorForeground(color(255, 100));
     infoText.setPosition(infoTableX, infoTableY);
+    println("selected is\n", selectedMunicipality);
+
     imgPath = "./islandsImgs/" + selectedMunicipality + ".jpeg";
-    //println(imgPath);
+    println("imagpath is", imgPath);
     islandImg = loadImage(imgPath);
     showIslandImg = true;
     imgX = infoTableX;
-    imgY = infoTableY + 70;
+    imgY = infoTableY + 100;
+    
 
   } else {
     infoText.setText("");
@@ -993,8 +1012,13 @@ void computePopDensityData() {
     minPopYear1994Den, maxPopYear1994Den,
     minPopYear2000Den, maxPopYear2000Den,
     minPopYear2010Den, maxPopYear2010Den);
+}
 
-  
+float getPopDensityData(String year, String municipalityName) {
+  TableRow popRow = populationTable.findRow(municipalityName, "Municipality");
+  int area = popRow.getInt("Area");
+  float pop = popRow.getFloat(year); //"Population 1980 Census")
+  return pop/area;
 }
 
 
