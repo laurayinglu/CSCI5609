@@ -41,6 +41,8 @@ String highlightedMunicipality = "";
 String selectedMunicipality = "Romanum";
 String islandInput1 = "";
 String islandInput2 = "";
+String popIslandInput1 = "";
+String popIslandInput2 = "";
 
 String selectedState = "all";
 
@@ -293,6 +295,22 @@ void draw() {
   if (showIslandImg)
     image(islandImg, imgX, imgY, 330, 100);
    
+}
+void pop1(ControlEvent event) { //<>// //<>// //<>// //<>// //<>//
+  // String[] states = {"YAP", "CHU", "KOS", "POH"};
+  
+  if (event.isFrom("pop1")) {
+    popIslandInput1 = censusYears[(int)event.getController().getValue()];
+    println("popIslandInput1: " + popIslandInput1);
+  }
+}
+void pop2(ControlEvent event) { //<>// //<>// //<>// //<>// //<>//
+  // String[] states = {"YAP", "CHU", "KOS", "POH"};
+  
+  if (event.isFrom("pop2")) {
+    popIslandInput2 = censusYears[(int)event.getController().getValue()];
+    println("popIslandInput2: " + popIslandInput2);
+  }
 }
 
 
