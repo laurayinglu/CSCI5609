@@ -59,6 +59,20 @@ static class TableUtils {
     }
     return PApplet.subset(indicesOut, 0, count);
   }
+  
+  
+  static public int[] findRowIndicesForState(Table t, final String value1) {
+    int[] indices1 = t.findRowIndices(value1, 1);
+    int[] indicesOut = new int[t.getRowCount()];
+    int count = 0;
+    for (int r=0; r<t.getRowCount(); r++) {
+      if ((contains(indices1, r))) {
+        indicesOut[count] = r;
+        count++;
+      }
+    }
+    return PApplet.subset(indicesOut, 0, count);
+  }
 
   
   static public int[] findRowIndicesForTwoCriteria(Table t, final String value1, final String column1,
